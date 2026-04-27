@@ -38,6 +38,7 @@ import UserManagement from './Components/Users/UserManagement';
 import PaymentApproval from './Components/Admin/PaymentApproval';
 import AdminUpdatePassword from './Components/Admin/AdminUpdatePassword';
 import Payment from './Components/Dashboard/Payment';
+import PWAPrompt from './Components/PWA/PWAPrompt';
 
 // Helper function to check if user has required permission
 const hasPermission = (user, requiredPermission) => {
@@ -428,6 +429,8 @@ export default function App() {
         />
       </Routes>
       <Footer />
+      <PWAPrompt />
+
     </Router>
   );
 }

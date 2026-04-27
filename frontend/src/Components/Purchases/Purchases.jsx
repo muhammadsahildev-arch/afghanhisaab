@@ -45,7 +45,8 @@ const currencies = [
   { code: 'PKR', name: 'Pakistani Rupee', symbol: '₨', flag: '🇵🇰' },
   { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪' },
   { code: 'SAR', name: 'Saudi Riyal', symbol: 'ر.س', flag: '🇸🇦' },
-];
+  { code: 'AFN', name: 'Afghan Afghani', symbol: '؋', flag: '🇦🇫' }
+]; 
 
 // Language Translations
 const translations = {

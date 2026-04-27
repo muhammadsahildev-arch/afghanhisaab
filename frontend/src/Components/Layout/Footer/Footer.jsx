@@ -115,9 +115,9 @@ const Footer = () => {
   ];
 
   const contactInfo = [
-    { icon: Phone, text: '+92 300 1234567', href: 'tel:+923001234567' },
-    { icon: Mail, text: 'info@watanhisaab.com', href: 'mailto:info@watanhisaab.com' },
-    { icon: MapPin, text: 'Karachi, Pakistan', href: '#' }
+    { icon: Phone, text: '+92 33691 18242', href: 'tel:+923369118242' },
+    { icon: Mail, text: 'm.dawood.engr@gmail.com', href: 'mailto:m.dawood.engr@gmail.com' },
+    { icon: MapPin, text: 'Kandahar, Afghanistan', href: '#' }
   ];
 
   // Get translated quick links names

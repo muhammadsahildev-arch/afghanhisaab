@@ -38,7 +38,7 @@ const Login = () => {
   // Language translations
   const translations = {
     en: {
-      brandName: "CurrencyExchange",
+      brandName: "watanhisaab",
       welcomeBack: "Welcome Back to",
       secureTrading: "Secure Trading",
       description: "Access your account to manage currency exchanges, track transactions, and enjoy competitive rates with enterprise-grade security.",
@@ -50,7 +50,7 @@ const Login = () => {
       ],
       testimonial: {
         text: "\"The best currency exchange platform I've used. Fast, secure, and great rates!\"",
-        name: "Mohammad Rizwan",
+        name: "Mohammad Dawood",
         title: "Business Owner"
       },
       securityBadge: "ISO 27001 Certified • 256-bit Encryption",
@@ -351,15 +351,7 @@ const Login = () => {
             className="hidden lg:block relative"
           >
             <div className="relative z-10">
-              {/* Brand Logo */}
-              <div className="flex items-center space-x-2 mb-8" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-red-500 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">FX</span>
-                </div>
-                <span className="text-2xl font-bold text-gray-900">
-                  Currency<span className="text-green-600">{t.brandName.replace('Currency', '')}</span>
-                </span>
-              </div>
+           
 
               <h1 className="text-4xl font-bold text-gray-900 mb-4">
                 {t.welcomeBack}{' '}

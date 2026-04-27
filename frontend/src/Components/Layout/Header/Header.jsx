@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Globe, ChevronDown, Home, Info, Phone, User, LogIn } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, Home, Info, Phone, User, LogIn, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../../assets/logo.png'
 
@@ -7,11 +7,73 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState(() => {
-    // Load saved language from localStorage on initial render
     return localStorage.getItem('appLanguage') || 'en';
   });
+  
+  // PWA Install states
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
 
-  // Translation object - all texts in different languages
+  // Check if app is already installed
+  useEffect(() => {
+    // Check if running in standalone mode (installed)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    setIsInstalled(isStandalone);
+    
+    if (isStandalone) {
+      setShowInstallButton(false);
+    }
+  }, []);
+
+  // Handle PWA install prompt
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+      console.log('✅ Install prompt available');
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    window.addEventListener('appinstalled', () => {
+      setShowInstallButton(false);
+      setDeferredPrompt(null);
+      setIsInstalled(true);
+      console.log('✅ App was installed');
+    });
+
+    // For testing on localhost - show button anyway after 3 seconds
+    const timer = setTimeout(() => {
+      if (!showInstallButton && !isInstalled) {
+        console.log('⚠️ No install prompt event, but showing button anyway for testing');
+        setShowInstallButton(true);
+      }
+    }, 3000);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      clearTimeout(timer);
+    };
+  }, [showInstallButton, isInstalled]);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      // Show the browser's install prompt
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('User accepted install');
+        setShowInstallButton(false);
+      }
+      setDeferredPrompt(null);
+    } else {
+      // Fallback for browsers that don't support beforeinstallprompt
+      alert('Click the browser menu (3 dots) and select "Install App" or "Add to Home Screen"');
+    }
+  };
+
   const translations = {
     en: {
       nav: {
@@ -24,7 +86,8 @@ const Header = () => {
         logoFirstPart: 'Watan',
         logoSecondPart: 'Hisaab',
         logoSubtext: 'Digital Financial Solutions',
-        selectLanguage: 'Select Language'
+        selectLanguage: 'Select Language',
+        install: '📱 Install App'
       }
     },
     ur: {
@@ -38,7 +101,8 @@ const Header = () => {
         logoFirstPart: 'وطن',
         logoSecondPart: 'حساب',
         logoSubtext: 'ڈیجیٹل فنانشل سلوشنز',
-        selectLanguage: 'زبان منتخب کریں'
+        selectLanguage: 'زبان منتخب کریں',
+        install: '📱 ایپ انسٹال کریں'
       }
     },
     ps: {
@@ -52,7 +116,8 @@ const Header = () => {
         logoFirstPart: 'وطن',
         logoSecondPart: 'حساب',
         logoSubtext: 'ډیجیټل مالي حل لارې',
-        selectLanguage: 'ژبه غوره کړئ'
+        selectLanguage: 'ژبه غوره کړئ',
+        install: '📱 ایپ نصب کړئ'
       }
     },
     fa: {
@@ -66,7 +131,8 @@ const Header = () => {
         logoFirstPart: 'وطن',
         logoSecondPart: 'حساب',
         logoSubtext: 'راهکارهای مالی دیجیتال',
-        selectLanguage: 'انتخاب زبان'
+        selectLanguage: 'انتخاب زبان',
+        install: '📱 نصب برنامه'
       }
     }
   };
@@ -86,23 +152,19 @@ const Header = () => {
 
   const handleLanguageChange = (lang) => {
     setCurrentLang(lang.code);
-    localStorage.setItem('appLanguage', lang.code); // Save to localStorage
+    localStorage.setItem('appLanguage', lang.code);
     setLangOpen(false);
-    console.log(`Changing language to: ${lang.name}`);
-    // Optional: reload page to refresh all components (simplest approach)
     window.location.reload();
   };
 
-  // Get current language display name
   const currentLanguageName = languages.find(lang => lang.code === currentLang)?.name || 'English';
 
   return (
     <header className="bg-black shadow-2xl relative z-50 border-b-4 border-red-600">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
-          {/* Logo with enhanced design */}
+          {/* Logo */}
           <div className="flex-shrink-0 flex items-center group">
-            {/* Logo Image */}
             <img 
               src={logo} 
               alt="WatanHisaab Logo" 
@@ -119,7 +181,7 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation with icons */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -140,7 +202,21 @@ const Header = () => {
 
           {/* Right side buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            {/* Language Dropdown with enhanced styling */}
+            {/* Install App Button */}
+            {showInstallButton && !isInstalled && (
+              <button
+                onClick={handleInstallClick}
+                className="group relative bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-semibold overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-blue-500/30"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+                <span className="relative flex items-center">
+                  <Download size={18} className="mr-2 animate-bounce" />
+                  {translations[currentLang].common.install}
+                </span>
+              </button>
+            )}
+
+            {/* Language Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
@@ -151,7 +227,6 @@ const Header = () => {
                 <ChevronDown size={16} className={`text-red-400 transition-all duration-300 ${langOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Language Dropdown Menu */}
               {langOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-black border-2 border-green-500/30 rounded-xl shadow-2xl py-2 overflow-hidden z-50">
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-red-500 to-green-500"></div>
@@ -173,7 +248,7 @@ const Header = () => {
               )}
             </div>
 
-            {/* Enhanced Login Button */}
+            {/* Login Button */}
             <Link to="/login">
               <button className="group relative bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-lg font-semibold overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-green-500/30">
                 <span className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
@@ -185,12 +260,22 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Mobile menu button with enhanced styling */}
+          {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
-            {/* Mobile Login Button */}
+            {/* Mobile Install Button */}
+            {showInstallButton && !isInstalled && (
+              <button
+                onClick={handleInstallClick}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center shadow-lg shadow-blue-500/20"
+              >
+                <Download size={14} className="mr-1" />
+                Install
+              </button>
+            )}
+            
             <Link to="/login">
-              <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center shadow-lg shadow-green-500/20">
-                <User size={16} className="mr-1" />
+              <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center shadow-lg shadow-green-500/20">
+                <User size={14} className="mr-1" />
                 {translations[currentLang].common.login}
               </button>
             </Link>
@@ -207,7 +292,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation with enhanced styling */}
+        {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 border-t-2 border-red-600/30 mt-2">
             <nav className="flex flex-col space-y-2">
@@ -227,7 +312,6 @@ const Header = () => {
                 );
               })}
               
-              {/* Mobile Language Selector with enhanced styling */}
               <div className="pt-4 mt-2 border-t border-gray-800">
                 <p className="text-gray-400 text-sm mb-3 flex items-center">
                   <Globe size={16} className="mr-2 text-green-500" />

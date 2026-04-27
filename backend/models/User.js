@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    default: 'customer'
+    default: 'shop_admin'
   },
   
   // Common Profile Fields

@@ -37,6 +37,9 @@ import {
   Coffee,
   Target
 } from 'lucide-react';
+import bi from '../../assets/bi.avif'
+import boy from '../../assets/boy.avif'
+import bib from '../../assets/1.avif'
 
 // Language Translations
 const translations = {
@@ -722,7 +725,7 @@ const Home = () => {
       role: "CEO, Rizwan Enterprises",
       content: t.testimonial1 || "Best currency exchange service in town. We've saved over 15% on our international transactions compared to banks. Competitive rates and excellent customer service!",
       rating: 5,
-      image: "https://i.ibb.co/FL03gKVW/boy.avif",
+      image: bi,
       company: "Rizwan Enterprises"
     },
     {
@@ -730,7 +733,7 @@ const Home = () => {
       role: "International Travel Consultant",
       content: t.testimonial2 || "I arrange tours for hundreds of clients yearly and always use their service. Quick, reliable, and trustworthy. My clients appreciate the great rates!",
       rating: 5,
-      image: "https://i.ibb.co/PGZGZt0h/b.jpg",
+      image: boy,
       company: "Ayesha Travels"
     },
     {
@@ -738,7 +741,7 @@ const Home = () => {
       role: "Import-Export Business Owner",
       content: t.testimonial3 || "Their online platform makes it so easy to manage currency for my import business. Real-time rates and instant transfers have streamlined our operations.",
       rating: 5,
-      image: "https://i.ibb.co/B5zVGXBR/b.jpg",
+      image: bib,
       company: "Ahmed Traders"
     },
     {
@@ -746,7 +749,7 @@ const Home = () => {
       role: "Student (International Education)",
       content: t.testimonial4 || "Great rates for international tuition payments. Saved a lot of money compared to banks. Their student support team is very helpful!",
       rating: 5,
-      image: "https://i.ibb.co/B5zVGXBR/b.jpg",
+      image: bi,
       company: "University of London"
     }
   ];
@@ -815,223 +818,239 @@ const Home = () => {
       className="min-h-screen bg-white overflow-hidden"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      {/* Hero Section */}
-      <motion.section 
-        variants={fadeInUp}
-        className="relative bg-black overflow-hidden min-h-[90vh] flex items-center"
-      >
-        {/* Animated background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-red-500/20 animate-pulse-slow"></div>
-          <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-red-500/20 via-transparent to-green-500/20 animate-pulse-slower"></div>
+     {/* Hero Section */}
+<motion.section 
+  variants={fadeInUp}
+  className="relative bg-black overflow-hidden min-h-[90vh] flex items-center"
+>
+  {/* Animated background */}
+  <div className="absolute inset-0">
+    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-red-500/20 animate-pulse-slow"></div>
+    <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-red-500/20 via-transparent to-green-500/20 animate-pulse-slower"></div>
+    
+    {/* Floating particles */}
+    {[...Array(20)].map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute w-1 h-1 bg-white/30 rounded-full"
+        style={{
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+        }}
+        animate={{
+          y: [0, -30, 0],
+          opacity: [0, 1, 0],
+        }}
+        transition={{
+          duration: Math.random() * 3 + 2,
+          repeat: Infinity,
+          delay: Math.random() * 2,
+        }}
+      />
+    ))}
+  </div>
+
+  {/* Decorative gradient bar */}
+  <motion.div 
+    initial={{ scaleX: 0 }}
+    animate={{ scaleX: 1 }}
+    transition={{ duration: 1, delay: 0.5 }}
+    className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-red-500 to-green-500 origin-left"
+  />
+
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+    <div className={`grid lg:grid-cols-2 gap-12 items-center`}>
+      {/* Left Content */}
+      <motion.div variants={fadeInLeft} className={isRTL ? 'text-right' : ''}>
+        <motion.div
+          variants={itemVariants}
+          className={`inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-green-500/30 ${isRTL ? 'flex-row-reverse' : ''}`}
+        >
+          <Sparkles className="w-4 h-4 text-green-400" />
+          <span className="text-sm text-white">{t.heroBadge}</span>
+        </motion.div>
+
+        {/* Fixed heading - no character splitting for RTL languages */}
+        {isRTL ? (
+          <motion.h1 
+            variants={itemVariants}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight text-right"
+            style={{ direction: 'rtl' }}
+          >
+            {t.heroTitle}
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400">
+              {t.heroTitleGradient}
+            </span>
+          </motion.h1>
+        ) : (
+          <motion.h1 
+            variants={wordVariants}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+          >
+            {titleText.map((word, wordIndex) => (
+              <motion.span key={wordIndex} className="inline-block mr-2">
+                {word.split("").map((char, charIndex) => (
+                  <motion.span
+                    key={charIndex}
+                    variants={letterVariants}
+                    className="inline-block"
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </motion.span>
+            ))}
+            <br />
+            {subtitleText.map((word, wordIndex) => (
+              <motion.span key={wordIndex} className="inline-block mr-2">
+                {word.split("").map((char, charIndex) => (
+                  <motion.span
+                    key={charIndex}
+                    variants={letterVariants}
+                    className={`inline-block ${word === 'Simple' ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400' : ''}`}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </motion.span>
+            ))}
+          </motion.h1>
+        )}
+
+        <motion.p 
+          variants={itemVariants}
+          className={`text-gray-300 text-lg md:text-xl mb-8 max-w-xl ${isRTL ? 'text-right' : ''}`}
+          style={isRTL ? { direction: 'rtl' } : {}}
+        >
+          {t.heroText}
+        </motion.p>
+
+        <motion.div 
+          variants={itemVariants}
+          className={`flex flex-wrap gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}
+        >
+          <Link to="/sign-up">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="group relative bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-4 rounded-xl font-semibold overflow-hidden shadow-lg hover:shadow-xl hover:shadow-green-500/30"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+              <span className={`relative flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                {t.getStarted}
+                <ArrowRight size={18} className={`${isRTL ? 'ml-2 rotate-180' : 'mr-2'} group-hover:translate-x-1 transition-transform`} />
+              </span>
+            </motion.button>
+          </Link>
           
-          {/* Floating particles */}
-          {[...Array(20)].map((_, i) => (
+          <Link to="/login">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-transparent border-2 border-green-500 text-white px-8 py-4 rounded-xl font-semibold hover:bg-green-500/10 transition-all duration-300"
+            >
+              {t.signIn}
+            </motion.button>
+          </Link>
+        </motion.div>
+
+        {/* Features list */}
+        <motion.div 
+          variants={itemVariants}
+          className={`grid grid-cols-2 gap-4 mt-10 ${isRTL ? 'text-right' : ''}`}
+        >
+          {features.slice(0, 6).map((feature, index) => (
+            <div key={index} className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2 flex-row-reverse' : 'space-x-2'}`}>
+              <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
+              <span className="text-gray-400 text-sm">{feature}</span>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Trust badges */}
+        <motion.div 
+          variants={itemVariants}
+          className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4 flex-row-reverse' : 'space-x-4'} mt-6`}
+        >
+          <div className={`flex ${isRTL ? '-space-x-reverse space-x-reverse' : '-space-x-2'}`}>
+            {[1,2,3,4].map((i) => (
+              <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-red-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                {i}
+              </div>
+            ))}
+          </div>
+          <span className="text-gray-400 text-sm">{t.trustedBy}</span>
+        </motion.div>
+      </motion.div>
+
+      {/* Right Content - Exchange Rates Card */}
+      <motion.div 
+        variants={fadeInRight}
+        className="bg-black/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-800 shadow-2xl"
+      >
+        <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <h3 className="text-white font-semibold text-lg">{t.liveExchangeRates}</h3>
+          <span className="text-xs text-green-500 bg-green-500/10 px-3 py-1 rounded-full animate-pulse">{t.updatedRealTime}</span>
+        </div>
+
+        <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+          {exchangeRates.map((rate, index) => (
             <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white/30 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: Math.random() * 3 + 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
+              key={index}
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`flex items-center justify-between p-3 bg-gray-900/50 rounded-xl hover:bg-gray-900 transition-colors group ${isRTL ? 'flex-row-reverse' : ''}`}
+            >
+              <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
+                <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-red-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">{rate.currency}</span>
+                </div>
+                <span className="text-white font-medium">{rate.currency}</span>
+              </div>
+              <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+                <span className="text-white font-bold">{t.pkr} {rate.rate}</span>
+                <span className={`text-sm ${
+                  rate.direction === 'up' ? 'text-green-500' : 'text-red-500'
+                }`}>
+                  {rate.change}
+                </span>
+              </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Decorative gradient bar */}
-        <motion.div 
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-red-500 to-green-500 origin-left"
-        />
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          className={`w-full mt-6 bg-gradient-to-r from-gray-900 to-black text-white py-3 rounded-xl font-medium border border-gray-800 hover:border-green-500/30 transition-all duration-300 flex items-center justify-center ${isRTL ? 'flex-row-reverse space-x-reverse space-x-2' : 'space-x-2'} group`}
+        >
+          <span>{t.viewAllCurrencies}</span>
+          <ChevronRight size={16} className={`${isRTL ? 'rotate-180' : ''} group-hover:translate-x-1 transition-transform`} />
+        </motion.button>
+      </motion.div>
+    </div>
+  </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-          <div className={`grid lg:grid-cols-2 gap-12 items-center ${isRTL ? 'lg:grid-cols-2' : ''}`}>
-            {/* Left Content */}
-            <motion.div variants={fadeInLeft} className={isRTL ? 'text-right' : ''}>
-              <motion.div
-                variants={itemVariants}
-                className={`inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-green-500/30 ${isRTL ? 'flex-row-reverse' : ''}`}
-              >
-                <Sparkles className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-white">{t.heroBadge}</span>
-              </motion.div>
-
-              <motion.h1 
-                variants={wordVariants}
-                className={`text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight ${isRTL ? 'text-right' : ''}`}
-              >
-                {titleText.map((word, wordIndex) => (
-                  <motion.span key={wordIndex} className={`inline-block ${isRTL ? 'ml-2' : 'mr-2'}`}>
-                    {word.split("").map((char, charIndex) => (
-                      <motion.span
-                        key={charIndex}
-                        variants={letterVariants}
-                        className="inline-block"
-                      >
-                        {char}
-                      </motion.span>
-                    ))}
-                  </motion.span>
-                ))}
-                <br />
-                {subtitleText.map((word, wordIndex) => (
-                  <motion.span key={wordIndex} className={`inline-block ${isRTL ? 'ml-2' : 'mr-2'}`}>
-                    {word.split("").map((char, charIndex) => (
-                      <motion.span
-                        key={charIndex}
-                        variants={letterVariants}
-                        className={`inline-block ${word === 'Simple' || word === 'آسان' || word === 'ساده' || word === 'ساده' ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400' : ''}`}
-                      >
-                        {char}
-                      </motion.span>
-                    ))}
-                  </motion.span>
-                ))}
-              </motion.h1>
-
-              <motion.p 
-                variants={itemVariants}
-                className={`text-gray-300 text-lg md:text-xl mb-8 max-w-xl ${isRTL ? 'text-right' : ''}`}
-              >
-                {t.heroText}
-              </motion.p>
-
-              <motion.div 
-                variants={itemVariants}
-                className={`flex flex-wrap gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}
-              >
-                <Link to="/signup">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="group relative bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-4 rounded-xl font-semibold overflow-hidden shadow-lg hover:shadow-xl hover:shadow-green-500/30"
-                  >
-                    <span className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-                    <span className={`relative flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                      {t.getStarted}
-                      <ArrowRight size={18} className={`${isRTL ? 'ml-2 rotate-180' : 'mr-2'} group-hover:translate-x-1 transition-transform`} />
-                    </span>
-                  </motion.button>
-                </Link>
-                
-                <Link to="/login">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-transparent border-2 border-green-500 text-white px-8 py-4 rounded-xl font-semibold hover:bg-green-500/10 transition-all duration-300"
-                  >
-                    {t.signIn}
-                  </motion.button>
-                </Link>
-              </motion.div>
-
-              {/* Features list */}
-              <motion.div 
-                variants={itemVariants}
-                className={`grid grid-cols-2 gap-4 mt-10 ${isRTL ? 'text-right' : ''}`}
-              >
-                {features.slice(0, 6).map((feature, index) => (
-                  <div key={index} className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2 flex-row-reverse' : 'space-x-2'}`}>
-                    <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-                    <span className="text-gray-400 text-sm">{feature}</span>
-                  </div>
-                ))}
-              </motion.div>
-
-              {/* Trust badges */}
-              <motion.div 
-                variants={itemVariants}
-                className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4 flex-row-reverse' : 'space-x-4'} mt-6`}
-              >
-                <div className={`flex ${isRTL ? '-space-x-reverse space-x-reverse' : '-space-x-2'}`}>
-                  {[1,2,3,4].map((i) => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-red-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
-                      {i}
-                    </div>
-                  ))}
-                </div>
-                <span className="text-gray-400 text-sm">{t.trustedBy}</span>
-              </motion.div>
-            </motion.div>
-
-            {/* Right Content - Exchange Rates Card */}
-            <motion.div 
-              variants={fadeInRight}
-              className="bg-black/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-800 shadow-2xl"
-            >
-              <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <h3 className="text-white font-semibold text-lg">{t.liveExchangeRates}</h3>
-                <span className="text-xs text-green-500 bg-green-500/10 px-3 py-1 rounded-full animate-pulse">{t.updatedRealTime}</span>
-              </div>
-
-              <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar">
-                {exchangeRates.map((rate, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex items-center justify-between p-3 bg-gray-900/50 rounded-xl hover:bg-gray-900 transition-colors group ${isRTL ? 'flex-row-reverse' : ''}`}
-                  >
-                    <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-red-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-xs">{rate.currency}</span>
-                      </div>
-                      <span className="text-white font-medium">{rate.currency}</span>
-                    </div>
-                    <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-                      <span className="text-white font-bold">{t.pkr} {rate.rate}</span>
-                      <span className={`text-sm ${
-                        rate.direction === 'up' ? 'text-green-500' : 'text-red-500'
-                      }`}>
-                        {rate.change}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                className={`w-full mt-6 bg-gradient-to-r from-gray-900 to-black text-white py-3 rounded-xl font-medium border border-gray-800 hover:border-green-500/30 transition-all duration-300 flex items-center justify-center ${isRTL ? 'flex-row-reverse space-x-reverse space-x-2' : 'space-x-2'} group`}
-              >
-                <span>{t.viewAllCurrencies}</span>
-                <ChevronRight size={16} className={`${isRTL ? 'rotate-180' : ''} group-hover:translate-x-1 transition-transform`} />
-              </motion.button>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Animated wave at bottom */}
-        <div className="absolute bottom-0 left-0 w-full">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
-            <motion.path 
-              fill="#ffffff" 
-              fillOpacity="1" 
-              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-              animate={{
-                d: [
-                  "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
-                  "M0,32L80,37.3C160,43,320,53,480,48C640,43,800,21,960,16C1120,11,1280,21,1360,26.7L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
-                  "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-                ]
-              }}
-              transition={{ repeat: Infinity, duration: 15, ease: "easeInOut" }}
-            />
-          </svg>
-        </div>
-      </motion.section>
+  {/* Animated wave at bottom */}
+  <div className="absolute bottom-0 left-0 w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
+      <motion.path 
+        fill="#ffffff" 
+        fillOpacity="1" 
+        d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+        animate={{
+          d: [
+            "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
+            "M0,32L80,37.3C160,43,320,53,480,48C640,43,800,21,960,16C1120,11,1280,21,1360,26.7L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
+            "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+          ]
+        }}
+        transition={{ repeat: Infinity, duration: 15, ease: "easeInOut" }}
+      />
+    </svg>
+  </div>
+</motion.section>
 
       {/* Stats Section */}
       <motion.section

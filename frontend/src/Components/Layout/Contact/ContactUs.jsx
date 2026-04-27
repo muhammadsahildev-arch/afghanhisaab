@@ -74,10 +74,8 @@ const ContactUs = () => {
         requiredMessage: "Please enter your message"
       },
       branches: {
-        title: "Our Branches",
+        title: "Our Branch",
         mainBranch: "Main Branch",
-        lahoreBranch: "Lahore Branch",
-        islamabadBranch: "Islamabad Branch",
         address: "Address",
         phone: "Phone",
         email: "Email",
@@ -87,19 +85,9 @@ const ContactUs = () => {
       },
       branchDetails: {
         main: {
-          address: "123 Business Avenue, Block 6, Karachi, Pakistan",
+          address: "Zahid Bahar Market Ground Floor Shop No 19",
           hours: "Mon-Fri: 9:00 AM - 8:00 PM, Sat: 10:00 AM - 4:00 PM",
-          manager: "Ahmed Khan"
-        },
-        lahore: {
-          address: "456 Mall Road, Gulberg, Lahore, Pakistan",
-          hours: "Mon-Fri: 9:00 AM - 7:00 PM, Sat: 10:00 AM - 3:00 PM",
-          manager: "Fatima Ali"
-        },
-        islamabad: {
-          address: "789 Blue Area, F-6, Islamabad, Pakistan",
-          hours: "Mon-Fri: 9:00 AM - 6:00 PM, Closed Saturday",
-          manager: "Usman Chaudhry"
+          manager: "M Dawood"
         }
       },
       faq: {
@@ -163,10 +151,8 @@ const ContactUs = () => {
         requiredMessage: "براہ کرم اپنا پیغام درج کریں"
       },
       branches: {
-        title: "ہماری شاخیں",
+        title: "ہماری شاخ",
         mainBranch: "مرکزی شاخ",
-        lahoreBranch: "لاہور شاخ",
-        islamabadBranch: "اسلام آباد شاخ",
         address: "پتہ",
         phone: "فون",
         email: "ای میل",
@@ -176,19 +162,9 @@ const ContactUs = () => {
       },
       branchDetails: {
         main: {
-          address: "123 بزنس ایونیو، بلاک 6، کراچی، پاکستان",
+          address: "زاہد بہار مارکیٹ گراؤنڈ فلور شاپ نمبر 19",
           hours: "پیر تا جمعہ: 9:00 AM - 8:00 PM، ہفتہ: 10:00 AM - 4:00 PM",
-          manager: "احمد خان"
-        },
-        lahore: {
-          address: "456 مال روڈ، گلبرگ، لاہور، پاکستان",
-          hours: "پیر تا جمعہ: 9:00 AM - 7:00 PM، ہفتہ: 10:00 AM - 3:00 PM",
-          manager: "فاطمہ علی"
-        },
-        islamabad: {
-          address: "789 بلیو ایریا، ایف-6، اسلام آباد، پاکستان",
-          hours: "پیر تا جمعہ: 9:00 AM - 6:00 PM، ہفتہ کو بند",
-          manager: "عثمان چوہدری"
+          manager: "م داؤد"
         }
       },
       faq: {
@@ -252,10 +228,8 @@ const ContactUs = () => {
         requiredMessage: "مهرباني وکړئ خپل پیغام دننه کړئ"
       },
       branches: {
-        title: "زموږ څانګې",
+        title: "زموږ څانګه",
         mainBranch: "اصلي څانګه",
-        lahoreBranch: "لاهور څانګه",
-        islamabadBranch: "اسلام اباد څانګه",
         address: "پته",
         phone: "تلیفون",
         email: "بریښنالیک",
@@ -265,19 +239,9 @@ const ContactUs = () => {
       },
       branchDetails: {
         main: {
-          address: "123 بزنس ایونیو، بلاک 6، کراچي، پاکستان",
+          address: "زااهد بهار مارکيټ ګراونډ فلور شاپ نمبر 19",
           hours: "دوشنبه تر جمعه: 9:00 AM - 8:00 PM، شنبه: 10:00 AM - 4:00 PM",
-          manager: "احمد خان"
-        },
-        lahore: {
-          address: "456 مال روډ، ګلبرګ، لاهور، پاکستان",
-          hours: "دوشنبه تر جمعه: 9:00 AM - 7:00 PM، شنبه: 10:00 AM - 3:00 PM",
-          manager: "فاطمه علي"
-        },
-        islamabad: {
-          address: "789 بلیو ایریا، ایف-6، اسلام اباد، پاکستان",
-          hours: "دوشنبه تر جمعه: 9:00 AM - 6:00 PM، شنبه تړلې ده",
-          manager: "عثمان چوهدري"
+          manager: "م داوود"
         }
       },
       faq: {
@@ -341,10 +305,8 @@ const ContactUs = () => {
         requiredMessage: "لطفاً پیام خود را وارد کنید"
       },
       branches: {
-        title: "شعبات ما",
+        title: "شعبه ما",
         mainBranch: "شعبه اصلی",
-        lahoreBranch: "شعبه لاهور",
-        islamabadBranch: "شعبه اسلام‌آباد",
         address: "آدرس",
         phone: "تلفن",
         email: "ایمیل",
@@ -354,19 +316,9 @@ const ContactUs = () => {
       },
       branchDetails: {
         main: {
-          address: "123 خیابان بیزینس، بلوک 6، کراچی، پاکستان",
+          address: "بازار زاهد بهار، طبقه همکف، شماره فروشگاه 19",
           hours: "دوشنبه تا جمعه: 9:00 صبح - 8:00 شب، شنبه: 10:00 صبح - 4:00 بعد از ظهر",
-          manager: "احمد خان"
-        },
-        lahore: {
-          address: "456 جاده مال، گلبرگ، لاهور، پاکستان",
-          hours: "دوشنبه تا جمعه: 9:00 صبح - 7:00 شب، شنبه: 10:00 صبح - 3:00 بعد از ظهر",
-          manager: "فاطمه علی"
-        },
-        islamabad: {
-          address: "789 منطقه آبی، اف-6، اسلام‌آباد، پاکستان",
-          hours: "دوشنبه تا جمعه: 9:00 صبح - 6:00 بعد از ظهر، شنبه تعطیل",
-          manager: "عثمان چودری"
+          manager: "م داوود"
         }
       },
       faq: {
@@ -422,30 +374,12 @@ const ContactUs = () => {
     {
       id: 'main',
       name: t?.branches?.mainBranch || 'Main Branch',
-      address: t?.branchDetails?.main?.address || '123 Business Avenue, Karachi',
-      phone: '+92 300 1234567',
-      email: 'karachi@currencyexchange.com',
-      hours: t?.branchDetails?.main?.hours || 'Mon-Fri: 9AM-8PM',
-      manager: t?.branchDetails?.main?.manager || 'Ahmed Khan'
+      address: t?.branchDetails?.main?.address || "Zahid Bahar Market Ground Floor Shop No 19",
+      phone: '0093702835071',
+      email: 'm.dawood.engr@gmail.com',
+      hours: t?.branchDetails?.main?.hours || 'Mon-Fri: 9AM-8PM, Sat: 10AM-4PM',
+      manager: t?.branchDetails?.main?.manager || 'M Dawood'
     },
-    {
-      id: 'lahore',
-      name: t?.branches?.lahoreBranch || 'Lahore Branch',
-      address: t?.branchDetails?.lahore?.address || '456 Mall Road, Lahore',
-      phone: '+92 300 7654321',
-      email: 'lahore@currencyexchange.com',
-      hours: t?.branchDetails?.lahore?.hours || 'Mon-Fri: 9AM-7PM',
-      manager: t?.branchDetails?.lahore?.manager || 'Fatima Ali'
-    },
-    {
-      id: 'islamabad',
-      name: t?.branches?.islamabadBranch || 'Islamabad Branch',
-      address: t?.branchDetails?.islamabad?.address || '789 Blue Area, Islamabad',
-      phone: '+92 300 9876543',
-      email: 'islamabad@currencyexchange.com',
-      hours: t?.branchDetails?.islamabad?.hours || 'Mon-Fri: 9AM-6PM',
-      manager: t?.branchDetails?.islamabad?.manager || 'Usman Chaudhry'
-    }
   ];
 
   // Handle API success - FIXED infinite loop by using ref
@@ -571,7 +505,7 @@ const ContactUs = () => {
     {
       icon: MapPin,
       title: t?.contactCards?.visitUs || "Visit Us",
-      details: ['Main Branch: Karachi', 'Branches in Lahore & Islamabad'],
+      details: ['Main Branch: Zahid Bahar Market'],
       action: '#',
       bgColor: 'from-green-600 to-green-700',
       delay: 0.3
@@ -707,119 +641,125 @@ const ContactUs = () => {
       variants={containerVariants}
       className="min-h-screen bg-white overflow-hidden"
     >
-      {/* Hero Section */}
-      <motion.div 
-        variants={fadeInUp}
-        className="relative bg-black overflow-hidden"
-      >
-        {/* Animated background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-red-500/20 animate-pulse-slow"></div>
-          <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-red-500/20 via-transparent to-green-500/20 animate-pulse-slower"></div>
-          
-          {/* Floating particles */}
-          <motion.div 
-            animate={{ y: [0, -20, 0], opacity: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 4 }}
-            className="absolute top-1/4 left-1/4 w-2 h-2 bg-green-500 rounded-full"
-          />
-          <motion.div 
-            animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
-            transition={{ repeat: Infinity, duration: 5, delay: 1 }}
-            className="absolute top-3/4 left-1/2 w-3 h-3 bg-red-500 rounded-full"
-          />
-          <motion.div 
-            animate={{ y: [0, -25, 0], opacity: [0.4, 0.9, 0.4] }}
-            transition={{ repeat: Infinity, duration: 4.5, delay: 2 }}
-            className="absolute top-1/2 left-3/4 w-2 h-2 bg-green-500 rounded-full"
-          />
-          <motion.div 
-            animate={{ y: [0, -35, 0], opacity: [0.2, 0.7, 0.2] }}
-            transition={{ repeat: Infinity, duration: 5.5, delay: 0.5 }}
-            className="absolute top-1/3 left-2/3 w-4 h-4 bg-red-500 rounded-full"
-          />
-        </div>
+  {/* Hero Section */}
+<motion.div 
+  variants={fadeInUp}
+  className="relative bg-black overflow-hidden"
+>
+  {/* Animated background */}
+  <div className="absolute inset-0">
+    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-red-500/20 animate-pulse-slow"></div>
+    <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-red-500/20 via-transparent to-green-500/20 animate-pulse-slower"></div>
+    
+    {/* Floating particles */}
+    <motion.div 
+      animate={{ y: [0, -20, 0], opacity: [0.5, 1, 0.5] }}
+      transition={{ repeat: Infinity, duration: 4 }}
+      className="absolute top-1/4 left-1/4 w-2 h-2 bg-green-500 rounded-full"
+    />
+    <motion.div 
+      animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
+      transition={{ repeat: Infinity, duration: 5, delay: 1 }}
+      className="absolute top-3/4 left-1/2 w-3 h-3 bg-red-500 rounded-full"
+    />
+    <motion.div 
+      animate={{ y: [0, -25, 0], opacity: [0.4, 0.9, 0.4] }}
+      transition={{ repeat: Infinity, duration: 4.5, delay: 2 }}
+      className="absolute top-1/2 left-3/4 w-2 h-2 bg-green-500 rounded-full"
+    />
+    <motion.div 
+      animate={{ y: [0, -35, 0], opacity: [0.2, 0.7, 0.2] }}
+      transition={{ repeat: Infinity, duration: 5.5, delay: 0.5 }}
+      className="absolute top-1/3 left-2/3 w-4 h-4 bg-red-500 rounded-full"
+    />
+  </div>
 
-        {/* Decorative gradient bar */}
-        <motion.div 
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-red-500 to-green-500 origin-left"
-        />
-        
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Animated heading with word reveal */}
-            <motion.h1
-              variants={wordVariants}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4"
-            >
-              {titleText.map((word, wordIndex) => (
-                <motion.span key={wordIndex} className="inline-block mr-2">
-                  {word.split("").map((char, charIndex) => (
-                    <motion.span
-                      key={charIndex}
-                      variants={letterVariants}
-                      className={`inline-block ${word === 'Us' || word === 'کریں' || word === 'ونیسئ' || word === 'ما' ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400' : ''}`}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
+  {/* Decorative gradient bar */}
+  <motion.div 
+    initial={{ scaleX: 0 }}
+    animate={{ scaleX: 1 }}
+    transition={{ duration: 1, delay: 0.5 }}
+    className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-red-500 to-green-500 origin-left"
+  />
+  
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative">
+    <div className="text-center max-w-4xl mx-auto">
+      {/* Animated heading with word reveal - Fixed for RTL languages */}
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+        {(currentLang === 'ur' || currentLang === 'ps' || currentLang === 'fa') ? (
+          // For RTL languages (Urdu, Pashto, Farsi) - show as complete words
+          <span style={{ direction: 'rtl', display: 'inline-block' }}>
+            {t?.heroTitle}
+          </span>
+        ) : (
+          // For English - split into individual characters for animation
+          titleText.map((word, wordIndex) => (
+            <span key={wordIndex} className="inline-block mr-2">
+              {word.split("").map((char, charIndex) => (
+                <motion.span
+                  key={charIndex}
+                  variants={letterVariants}
+                  className={`inline-block ${word === 'Us' ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400' : ''}`}
+                >
+                  {char}
                 </motion.span>
               ))}
-            </motion.h1>
+            </span>
+          ))
+        )}
+      </h1>
 
-            <motion.p 
-              variants={itemVariants}
-              className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto"
-            >
-              {t?.heroSubtitle}
-            </motion.p>
-            
-            {/* Stats */}
+      <motion.p 
+        variants={itemVariants}
+        className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto"
+        style={(currentLang === 'ur' || currentLang === 'ps' || currentLang === 'fa') ? { direction: 'rtl' } : {}}
+      >
+        {t?.heroSubtitle}
+      </motion.p>
+      
+      {/* Stats */}
+      <motion.div 
+        variants={containerVariants}
+        className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-4xl mx-auto"
+      >
+        {[
+          { label: t?.stats?.branches || "Branches", value: '1', color: 'green' },
+          { label: t?.stats?.happyClients || "Happy Clients", value: '5000+', color: 'red' },
+          { label: t?.stats?.currencies || "Currencies", value: '25+', color: 'green' },
+          { label: t?.stats?.years || "Years", value: '10+', color: 'red' }
+        ].map((stat, index) => (
+          <motion.div 
+            key={index}
+            variants={itemVariants}
+            whileHover={{ scale: 1.05 }}
+            className="text-center group"
+          >
             <motion.div 
-              variants={containerVariants}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-4xl mx-auto"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5 + index * 0.1, type: "spring" }}
+              className={`text-3xl font-bold text-${stat.color}-500`}
             >
-              {[
-                { label: t?.stats?.branches || "Branches", value: '3', color: 'green' },
-                { label: t?.stats?.happyClients || "Happy Clients", value: '5000+', color: 'red' },
-                { label: t?.stats?.currencies || "Currencies", value: '25+', color: 'green' },
-                { label: t?.stats?.years || "Years", value: '10+', color: 'red' }
-              ].map((stat, index) => (
-                <motion.div 
-                  key={index}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.05 }}
-                  className="text-center group"
-                >
-                  <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.1, type: "spring" }}
-                    className={`text-3xl font-bold text-${stat.color}-500`}
-                  >
-                    {stat.value}
-                  </motion.div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </motion.div>
-              ))}
+              {stat.value}
             </motion.div>
-          </div>
-        </div>
-        
-        {/* Animated wave - fixed with static path */}
-        <div className="absolute bottom-0 left-0 w-full">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
-            <path 
-              fill="#ffffff" 
-              fillOpacity="1" 
-              d={wavePath}
-            />
-          </svg>
-        </div>
+            <div className="text-gray-400 text-sm">{stat.label}</div>
+          </motion.div>
+        ))}
       </motion.div>
+    </div>
+  </div>
+  
+  {/* Animated wave - fixed with static path */}
+  <div className="absolute bottom-0 left-0 w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
+      <path 
+        fill="#ffffff" 
+        fillOpacity="1" 
+        d={wavePath}
+      />
+    </svg>
+  </div>
+</motion.div>
 
       {/* Contact Info Cards */}
       <motion.div 
@@ -1019,7 +959,7 @@ const ContactUs = () => {
           <motion.div variants={fadeInRight} className="space-y-8">
             {/* Branch Selector */}
             <motion.div variants={itemVariants} className="bg-black rounded-3xl p-6 border border-gray-800">
-              <h3 className="text-xl font-semibold text-white mb-4">{t?.branches?.title || "Our Branches"}</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">{t?.branches?.title || "Our Branch"}</h3>
               <div className="flex flex-wrap gap-3">
                 {branches.map((branch, index) => (
                   <motion.button

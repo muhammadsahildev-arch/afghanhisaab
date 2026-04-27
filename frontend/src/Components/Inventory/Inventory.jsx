@@ -34,7 +34,7 @@ const currencies = [
   { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪' },
   { code: 'SAR', name: 'Saudi Riyal', symbol: 'ر.س', flag: '🇸🇦' },
   { code: 'AFN', name: 'Afghan Afghani', symbol: '؋', flag: '🇦🇫' }
-];
+]; 
 
 const Inventory = () => {
   const dispatch = useDispatch();

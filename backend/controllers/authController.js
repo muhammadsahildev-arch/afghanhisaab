@@ -37,13 +37,14 @@ exports.register = asyncHandler(async (req, res) => {
     });
   }
 
-  // Create user (as customer, will be upgraded after payment)
+  // Create user without shopData first
   const user = await User.create({
     email,
     password,
-    role: 'customer',
-    status: 'pending',
-    paymentStatus: 'pending',
+    role: 'shop_admin',
+    status: 'active',
+    paymentStatus: 'approved',
+    paymentExpiry: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days (3 months)
     profile: {
       fullName,
       phone
@@ -68,25 +69,51 @@ exports.register = asyncHandler(async (req, res) => {
     }
   });
 
+  // Now update shopData with the user's own _id
+  user.shopData = {
+    shopId: user._id, // Use the generated _id
+    permissions: ['all']
+  };
+  
+  await user.save();
+
   // Send welcome email
   try {
     const welcomeHtml = `
       <!DOCTYPE html>
       <html>
-      <head><style>body{font-family:Arial;padding:20px}</style></head>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #059669, #dc2626); color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9fafb; }
+          .trial-box { background: #e8f5e9; border-left: 4px solid #059669; padding: 15px; margin: 20px 0; }
+        </style>
+      </head>
       <body>
-        <h2>Welcome to Currency Exchange!</h2>
-        <p>Dear ${fullName},</p>
-        <p>Thank you for registering with Currency Exchange. Your account has been created successfully.</p>
-        <p>Please complete your payment to activate your account and start exchanging currencies.</p>
-        <p>Best regards,<br>Currency Exchange Team</p>
+        <div class="container">
+          <div class="header">
+            <h2>Welcome to Watan Hisaab!</h2>
+          </div>
+          <div class="content">
+            <p>Dear ${fullName},</p>
+            <p>Thank you for registering with Watan Hisaab. Your account has been created successfully.</p>
+            <div class="trial-box">
+              <h3>🎉 3 Months Free Trial!</h3>
+              <p>Your account is active with a <strong>3-month free trial period</strong>.</p>
+              <p><strong>Trial Expiry Date:</strong> ${new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+            </div>
+            <p>Best regards,<br>Watan Hisaab Team</p>
+          </div>
+        </div>
       </body>
       </html>
     `;
     
     await sendEmail({
       email: user.email,
-      subject: 'Welcome to Currency Exchange!',
+      subject: 'Welcome to Watan Hisaab - 3 Months Free Trial!',
       html: welcomeHtml
     });
   } catch (error) {

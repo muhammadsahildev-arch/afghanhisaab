@@ -18,6 +18,12 @@ import {
   Coffee,
   Zap
 } from 'lucide-react';
+import image1 from '../../../assets/image1.png'
+import image2 from '../../../assets/image2.png'
+import bi from '../../../assets/bi.avif'
+import boy from '../../../assets/boy.avif'
+import bib from '../../../assets/1.avif'
+
 
 // Language Translations
 const translations = {
@@ -595,37 +601,22 @@ const AboutUs = () => {
 
   const team = [
     {
-      name: 'Dawood Khan',
-      position: 'Founder & CEO',
-      experience: '15+',
-      image: 'https://i.ibb.co/cX7XVTbr/Gemini-Generated-Image-utgx8jutgx8jutgx.png',
-      bio: 'Former banker with extensive experience in foreign exchange markets.',
-      social: ['twitter', 'linkedin', 'facebook']
-    },
-    {
-      name: 'Prince',
-      position: 'CEO & VP',
-      experience: '12+',
-      image: 'https://i.ibb.co/kssYBSGy/Gemini-Generated-Image-w0smbrw0smbrw0sm.png',
-      bio: 'Expert in financial operations and customer service excellence.',
-      social: ['linkedin', 'twitter']
-    },
-    {
-      name: 'Zerena Chaudhry',
-      position: 'Head of Trading',
-      experience: '10+',
-      image: 'https://i.ibb.co/d499fD43/1.avif',
-      bio: 'Specializes in forex trading and market analysis.',
-      social: ['linkedin', 'twitter', 'instagram']
-    },
-    {
-      name: 'Sara Ahmed',
-      position: 'Customer Relations',
-      experience: '8+',
-      image: 'https://i.ibb.co/Rp5dR62J/bi.avif',
-      bio: 'Dedicated to providing exceptional customer experiences.',
-      social: ['linkedin', 'facebook']
-    }
+  name: 'Dawood Khan',
+  position: 'Founder & CEO',
+  experience: '20',
+  image: image1,
+  bio: 'Visionary leader with 20+ years of experience in foreign exchange and global financial markets. Founded Watan Hisaab to revolutionize digital currency trading and empower businesses with transparent, efficient exchange solutions.',
+  social: ['twitter', 'linkedin', 'facebook']
+},
+{
+  name: 'Prince',
+  position: 'CEO & VP',
+  experience: '10',
+  image: image2,
+  bio: 'Strategic executive driving operational excellence and customer innovation. With 10 years of specialized experience in financial operations, Prince leads our commitment to unparalleled service quality and client satisfaction.',
+  social: ['linkedin', 'twitter']
+}
+   
   ];
 
   const stats = [
@@ -643,21 +634,21 @@ const AboutUs = () => {
       role: t.businessOwner,
       content: t.testimonial1,
       rating: 5,
-      image: 'https://i.ibb.co/FL03gKVW/boy.avif'
+      image: bi
     },
     {
       name: 'Ayesha Khan',
       role: t.frequentTraveler,
       content: t.testimonial2,
       rating: 5,
-      image: 'https://i.ibb.co/PGZGZt0h/b.jpg'
+      image: boy
     },
     {
       name: 'Bilal Ahmed',
       role: t.importer,
       content: t.testimonial3,
       rating: 5,
-      image: 'https://i.ibb.co/B5zVGXBR/b.jpg'
+      image: bib
     }
   ];
 
@@ -774,119 +765,136 @@ const AboutUs = () => {
   return (
     <div className="min-h-screen bg-white overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Hero Section */}
+    <motion.div
+  ref={heroRef}
+  initial="hidden"
+  animate="visible"
+  variants={containerVariants}
+  className="relative bg-black overflow-hidden"
+>
+  {/* Animated background */}
+  <div className="absolute inset-0">
+    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-red-500/20 animate-pulse-slow"></div>
+    <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-red-500/20 via-transparent to-green-500/20 animate-pulse-slower"></div>
+    
+    {/* Floating particles */}
+    <motion.div 
+      animate={{ y: [0, -20, 0], opacity: [0.5, 1, 0.5] }}
+      transition={{ repeat: Infinity, duration: 4 }}
+      className="absolute top-1/4 left-1/4 w-2 h-2 bg-green-500 rounded-full"
+    />
+    <motion.div 
+      animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
+      transition={{ repeat: Infinity, duration: 5, delay: 1 }}
+      className="absolute top-3/4 left-1/2 w-3 h-3 bg-red-500 rounded-full"
+    />
+    <motion.div 
+      animate={{ y: [0, -25, 0], opacity: [0.4, 0.9, 0.4] }}
+      transition={{ repeat: Infinity, duration: 4.5, delay: 2 }}
+      className="absolute top-1/2 left-3/4 w-2 h-2 bg-green-500 rounded-full"
+    />
+    <motion.div 
+      animate={{ y: [0, -35, 0], opacity: [0.2, 0.7, 0.2] }}
+      transition={{ repeat: Infinity, duration: 5.5, delay: 0.5 }}
+      className="absolute top-1/3 left-2/3 w-4 h-4 bg-red-500 rounded-full"
+    />
+  </div>
+
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 relative">
+    <div className="text-center max-w-4xl mx-auto">
+      {/* Animated heading - without character splitting for RTL languages */}
       <motion.div
-        ref={heroRef}
+        variants={wordVariants}
         initial="hidden"
         animate="visible"
-        variants={containerVariants}
-        className="relative bg-black overflow-hidden"
+        className={`text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 ${isRTL ? 'text-right text-right-rtl' : ''}`}
+        style={isRTL ? { direction: 'rtl', fontFamily: 'inherit' } : {}}
       >
-        {/* Animated background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/20 via-transparent to-red-500/20 animate-pulse-slow"></div>
-          <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-red-500/20 via-transparent to-green-500/20 animate-pulse-slower"></div>
-          
-          {/* Floating particles */}
-          <motion.div 
-            animate={{ y: [0, -20, 0], opacity: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 4 }}
-            className="absolute top-1/4 left-1/4 w-2 h-2 bg-green-500 rounded-full"
-          />
-          <motion.div 
-            animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
-            transition={{ repeat: Infinity, duration: 5, delay: 1 }}
-            className="absolute top-3/4 left-1/2 w-3 h-3 bg-red-500 rounded-full"
-          />
-          <motion.div 
-            animate={{ y: [0, -25, 0], opacity: [0.4, 0.9, 0.4] }}
-            transition={{ repeat: Infinity, duration: 4.5, delay: 2 }}
-            className="absolute top-1/2 left-3/4 w-2 h-2 bg-green-500 rounded-full"
-          />
-          <motion.div 
-            animate={{ y: [0, -35, 0], opacity: [0.2, 0.7, 0.2] }}
-            transition={{ repeat: Infinity, duration: 5.5, delay: 0.5 }}
-            className="absolute top-1/3 left-2/3 w-4 h-4 bg-red-500 rounded-full"
-          />
-        </div>
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 relative">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Animated heading with word reveal */}
-            <motion.div
-              variants={wordVariants}
-              initial="hidden"
-              animate="visible"
-              className={`text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 ${isRTL ? 'text-right' : ''}`}
-            >
-              {titleText.map((word, wordIndex) => (
-                <motion.span key={wordIndex} className="inline-block mr-2">
-                  {word.split("").map((char, charIndex) => (
-                    <motion.span
-                      key={charIndex}
-                      variants={letterVariants}
-                      className={`inline-block ${word === 'Company' || word === 'کمپنی' || word === 'شرکت' || word === 'ما' ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400' : ''}`}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
+        {titleText.map((word, wordIndex) => (
+          <motion.span 
+            key={wordIndex} 
+            className={`inline-block mr-2 ${isRTL ? 'ml-2 mr-0' : ''}`}
+            style={isRTL ? { display: 'inline-block', whiteSpace: 'nowrap' } : {}}
+          >
+            {/* For RTL languages (Urdu, Pashto, Farsi), don't split characters */}
+            {isRTL ? (
+              <motion.span
+                variants={letterVariants}
+                className={`inline-block ${word === 'Company' || word === 'کمپنی' || word === 'شرکت' || word === 'ما' ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400' : ''}`}
+              >
+                {word}
+              </motion.span>
+            ) : (
+              // For English, split individual letters for animation
+              word.split("").map((char, charIndex) => (
+                <motion.span
+                  key={charIndex}
+                  variants={letterVariants}
+                  className={`inline-block ${word === 'Company' ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-red-400' : ''}`}
+                >
+                  {char}
                 </motion.span>
-              ))}
-            </motion.div>
-
-            {/* Typing animation */}
-            <motion.p
-              variants={itemVariants}
-              className={`text-gray-300 text-lg md:text-xl max-w-3xl mx-auto ${isRTL ? 'text-right' : ''}`}
-            >
-              {heroText}
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              variants={itemVariants}
-              className={`flex flex-wrap justify-center gap-4 mt-10 ${isRTL ? 'flex-row-reverse' : ''}`}
-            >
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="group relative bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-xl font-semibold overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-green-500/30"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-                <span className={`relative flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  {t.learnMore}
-                  <ChevronRight size={18} className={`${isRTL ? 'mr-2 rotate-180' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
-                </span>
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-transparent border-2 border-green-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-500/10 transition-all duration-300"
-              >
-                {t.contactUs}
-              </motion.button>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Animated wave */}
-        <div className="absolute bottom-0 left-0 w-full">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
-            <motion.path 
-              fill="#ffffff" 
-              fillOpacity="1" 
-              d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-              animate={{
-                d: [
-                  "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
-                  "M0,32L80,37.3C160,43,320,53,480,48C640,43,800,21,960,16C1120,11,1280,21,1360,26.7L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
-                  "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-                ]
-              }}
-              transition={{ repeat: Infinity, duration: 15, ease: "easeInOut" }}
-            />
-          </svg>
-        </div>
+              ))
+            )}
+          </motion.span>
+        ))}
       </motion.div>
+
+      {/* Hero text paragraph - animate as a whole for RTL */}
+      <motion.p
+        variants={itemVariants}
+        className={`text-gray-300 text-lg md:text-xl max-w-3xl mx-auto ${isRTL ? 'text-right' : ''}`}
+        style={isRTL ? { direction: 'rtl', textAlign: 'right' } : {}}
+      >
+        {heroText}
+      </motion.p>
+
+      {/* CTA Buttons */}
+      <motion.div
+        variants={itemVariants}
+        className={`flex flex-wrap justify-center gap-4 mt-10 ${isRTL ? 'flex-row-reverse' : ''}`}
+      >
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="group relative bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-xl font-semibold overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-green-500/30"
+        >
+          <span className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
+          <span className={`relative flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {t.learnMore}
+            <ChevronRight size={18} className={`${isRTL ? 'mr-2 rotate-180' : 'ml-2'} group-hover:translate-x-1 transition-transform`} />
+          </span>
+        </motion.button>
+        <motion.button 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-transparent border-2 border-green-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-500/10 transition-all duration-300"
+        >
+          {t.contactUs}
+        </motion.button>
+      </motion.div>
+    </div>
+  </div>
+
+  {/* Animated wave */}
+  <div className="absolute bottom-0 left-0 w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
+      <motion.path 
+        fill="#ffffff" 
+        fillOpacity="1" 
+        d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+        animate={{
+          d: [
+            "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
+            "M0,32L80,37.3C160,43,320,53,480,48C640,43,800,21,960,16C1120,11,1280,21,1360,26.7L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z",
+            "M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+          ]
+        }}
+        transition={{ repeat: Infinity, duration: 15, ease: "easeInOut" }}
+      />
+    </svg>
+  </div>
+</motion.div>
 
       {/* Stats Section */}
       <motion.div
@@ -1355,8 +1363,6 @@ const AboutUs = () => {
           </div>
         </div>
       </motion.div>
-
-   {/* Team Section */}
 {/* Team Section */}
 <motion.div
   ref={teamRef}
@@ -1364,7 +1370,7 @@ const AboutUs = () => {
   initial="hidden"
   whileInView="visible"
   viewport={{ once: true, amount: 0.2 }}
-  className="bg-black py-16"
+  className="bg-black py-10"
 >
   <div className="container mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center mb-12">
@@ -1391,32 +1397,29 @@ const AboutUs = () => {
       </motion.p>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
       {team.map((member, index) => (
         <motion.div
           key={index}
           variants={itemVariants}
           custom={index}
-          whileHover={{ y: -10, scale: 1.02 }}
-          className="group relative bg-gray-900 rounded-2xl overflow-hidden border border-gray-800 hover:border-green-500/30 transition-all duration-300"
+          whileHover={{ y: -5 }}
+          className="group relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800 hover:border-green-500/30 transition-all duration-300 max-w-md mx-auto w-full"
         >
-          <div className="relative overflow-hidden" style={{ paddingTop: '125%' }}> {/* 4:5 Aspect Ratio */}
-            <motion.img 
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.5 }}
+          {/* Image container - shows full image */}
+          <div className="relative w-full h-64 bg-gray-800 flex items-center justify-center">
+            <img 
               src={member.image} 
               alt={member.name}
-              className="absolute top-0 left-0 w-full h-full object-cover object-center"
+              className="w-full h-full object-contain"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/400x500?text=' + member.name.split(' ')[0];
+                e.target.src = 'https://via.placeholder.com/400x400?text=' + member.name.split(' ')[0];
               }}
             />
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
-              className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"
-            />
+            
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             
             {/* Social icons */}
             <motion.div 
@@ -1457,7 +1460,7 @@ const AboutUs = () => {
             </motion.div>
           </div>
           
-          <div className="p-6">
+          <div className="p-5">
             <h3 className="text-white font-bold text-lg mb-1 group-hover:text-green-400 transition-colors">
               {member.name}
             </h3>
@@ -1467,14 +1470,9 @@ const AboutUs = () => {
           </div>
 
           {/* Experience badge */}
-          <motion.div 
-            initial={{ x: 20, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.3 + index * 0.1 }}
-            className="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-red-500 text-white text-xs font-bold px-3 py-1 rounded-full z-10"
-          >
+          <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
             {member.experience}+
-          </motion.div>
+          </div>
         </motion.div>
       ))}
     </div>

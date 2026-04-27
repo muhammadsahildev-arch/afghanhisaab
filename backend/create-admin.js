@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/currency_exchange')
+mongoose.connect('mongodb+srv://muhammad:password123123@cluster0.8lekzkp.mongodb.net/watanhisaab?retryWrites=true&w=majority&appName=Cluster0')
   .then(async () => {
     console.log('✅ Connected to MongoDB');
     
@@ -27,7 +27,7 @@ mongoose.connect('mongodb://localhost:27017/currency_exchange')
     
     // Admin data
     const adminData = {
-      email: 'admin@osmanexchange.com',
+      email: 'm.dawood.engr@gmail.com',
       password: hashedPassword,
       role: 'system_admin',
       profile: {
@@ -51,7 +51,7 @@ mongoose.connect('mongodb://localhost:27017/currency_exchange')
     console.log('\n✅ Admin created successfully!');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('Admin ID:', result.insertedId);
-    console.log('Email: admin@osmanexchange.com');
+    console.log('Email: m.dawood.engr@gmail.com');
     console.log('Password: Admin@123456');
     console.log('Role: system_admin');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
