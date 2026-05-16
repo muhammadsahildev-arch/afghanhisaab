@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Plus,
   Save,
   ArrowLeft,
-  X,
   CheckCircle,
   RefreshCw,
-  BookOpen,
   User,
   FileText,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  X ,
+  Calculator,
+  Delete
 } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -25,6 +25,10 @@ const LedgerForm = () => {
   // Language state
   const [currentLang, setCurrentLang] = useState('en');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorInput, setCalculatorInput] = useState('');
+  const [calculatorExpression, setCalculatorExpression] = useState('');
+  const [activeField, setActiveField] = useState(null);
   
   // Get state from Redux
   const { loading, error, success } = useSelector((state) => state.newLedgerEntry);
@@ -43,200 +47,156 @@ const LedgerForm = () => {
   // Language translations
   const translations = {
     en: {
-      backToLedger: "Back to Ledger",
-      createNewLedgerEntry: "Create New Ledger Entry",
-      createDesc: "Add ledger entries with amounts and remaining balances",
-      ledgerEntrySaved: "Ledger entry saved successfully!",
-      redirectingToLedger: "Redirecting to ledger...",
-      errorSaving: "Error saving ledger entry",
+      backToLedger: "Back",
+      createNewLedgerEntry: "New Khata Entry",
+      createDesc: "Add person's khata entry",
+      ledgerEntrySaved: "Khata entry saved successfully!",
+      redirectingToLedger: "Redirecting...",
+      errorSaving: "Error saving khata entry",
       date: "Date",
-      ledgerEntries: "Ledger Entries",
-      addEntry: "Add Entry",
-      description: "Description",
-      name: "Name",
-      amount: "Amount",
-      remainingAmount: "Remaining Amount",
-      remainingPersonName: "Remaining Person Name",
-      balance: "Balance",
-      totalsByCurrency: "Totals by Currency",
+      name: "Person Name",
+      amount: "Total Amount",
+      remainingAmount: "Remaining Amount (Optional)",
+      description: "Description (Optional)",
+      currency: "Currency",
       totalAmount: "Total Amount",
-      totalRemaining: "Total Remaining",
-      netBalance: "Net Balance",
+      totalRemaining: "Remaining",
+      balance: "Paid / Received",
       cancel: "Cancel",
       saving: "Saving...",
-      saveLedgerEntry: "Save Ledger Entry",
-      enterDescription: "Enter description",
-      enterName: "Enter name",
-      enterPersonName: "Enter person name",
-      
-      // Validation Errors
-      descriptionRequired: "Description is required",
-      nameRequired: "Name is required",
-      amountRequired: "Amount is required",
-      amountGreaterThanZero: "Amount must be greater than 0",
-      remainingAmountRequired: "Remaining amount is required",
-      remainingAmountNegative: "Remaining amount cannot be negative",
-      remainingGreaterThanAmount: "Remaining amount cannot be greater than total amount",
-      remainingPersonRequired: "Remaining person name is required",
-      
-      // Placeholders
-      amountPlaceholder: "0.00",
-      remainingPlaceholder: "0.00",
-      descriptionPlaceholder: "Enter description",
-      namePlaceholder: "Enter name",
-      personPlaceholder: "Enter person name",
-      
-      // Status
-      active: "active",
-      
-      // Month names for date
-      january: "January", february: "February", march: "March", april: "April",
-      may: "May", june: "June", july: "July", august: "August",
-      september: "September", october: "October", november: "November", december: "December"
+      saveLedgerEntry: "Save Khata",
+      enterName: "Enter person name",
+      enterDescription: "Enter description (optional)",
+      enterRemainingAmount: "Remaining amount",
+      enterAmount: "Total amount",
+      required: "*",
+      remainingNote: "Leave empty if full amount is given/received",
+      errors: {
+        nameRequired: "Person name is required",
+        amountRequired: "Amount is required",
+        amountPositive: "Amount must be positive",
+        remainingInvalid: "Remaining amount cannot be greater than total amount"
+      },
+      calculator: {
+        title: "Calculator",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      }
     },
     ur: {
-      backToLedger: "لیجر پر واپس جائیں",
-      createNewLedgerEntry: "نیا لیجر اندراج بنائیں",
-      createDesc: "رقم اور باقی بیلنس کے ساتھ لیجر اندراجات شامل کریں",
-      ledgerEntrySaved: "لیجر اندراج کامیابی سے محفوظ ہوگیا!",
-      redirectingToLedger: "لیجر پر ری ڈائریکٹ کیا جا رہا ہے...",
-      errorSaving: "لیجر اندراج محفوظ کرنے میں خرابی",
+      backToLedger: "واپس",
+      createNewLedgerEntry: "نیا کھاتہ اندراج",
+      createDesc: "شخص کا کھاتہ اندراج شامل کریں",
+      ledgerEntrySaved: "کھاتہ اندراج کامیابی سے محفوظ ہوگیا!",
+      redirectingToLedger: "جا رہے ہیں...",
+      errorSaving: "کھاتہ محفوظ کرنے میں خرابی",
       date: "تاریخ",
-      ledgerEntries: "لیجر اندراجات",
-      addEntry: "اندراج شامل کریں",
-      description: "تفصیل",
-      name: "نام",
-      amount: "رقم",
-      remainingAmount: "باقی رقم",
-      remainingPersonName: "باقی شخص کا نام",
-      balance: "بیلنس",
-      totalsByCurrency: "کرنسی کے حساب سے کل",
+      name: "شخص کا نام",
+      amount: "کل رقم",
+      remainingAmount: "باقی رقم (اختیاری)",
+      description: "تفصیل (اختیاری)",
+      currency: "کرنسی",
       totalAmount: "کل رقم",
-      totalRemaining: "کل باقی",
-      netBalance: "خالص بیلنس",
-      cancel: "منسوخ کریں",
+      totalRemaining: "باقی",
+      balance: "ادا شدہ / وصول شدہ",
+      cancel: "منسوخ",
       saving: "محفوظ ہو رہا ہے...",
-      saveLedgerEntry: "لیجر اندراج محفوظ کریں",
-      enterDescription: "تفصیل درج کریں",
-      enterName: "نام درج کریں",
-      enterPersonName: "شخص کا نام درج کریں",
-      
-      descriptionRequired: "تفصیل درکار ہے",
-      nameRequired: "نام درکار ہے",
-      amountRequired: "رقم درکار ہے",
-      amountGreaterThanZero: "رقم صفر سے زیادہ ہونی چاہیے",
-      remainingAmountRequired: "باقی رقم درکار ہے",
-      remainingAmountNegative: "باقی رقم منفی نہیں ہو سکتی",
-      remainingGreaterThanAmount: "باقی رقم کل رقم سے زیادہ نہیں ہو سکتی",
-      remainingPersonRequired: "باقی شخص کا نام درکار ہے",
-      
-      amountPlaceholder: "0.00",
-      remainingPlaceholder: "0.00",
-      descriptionPlaceholder: "تفصیل درج کریں",
-      namePlaceholder: "نام درج کریں",
-      personPlaceholder: "شخص کا نام درج کریں",
-      
-      active: "فعال",
-      
-      january: "جنوری", february: "فروری", march: "مارچ", april: "اپریل",
-      may: "مئی", june: "جون", july: "جولائی", august: "اگست",
-      september: "ستمبر", october: "اکتوبر", november: "نومبر", december: "دسمبر"
+      saveLedgerEntry: "کھاتہ محفوظ کریں",
+      enterName: "شخص کا نام درج کریں",
+      enterDescription: "تفصیل درج کریں (اختیاری)",
+      enterRemainingAmount: "باقی رقم",
+      enterAmount: "کل رقم",
+      required: "*",
+      remainingNote: "مکمل رقم دے/لے چکے ہیں تو خالی چھوڑ دیں",
+      errors: {
+        nameRequired: "شخص کا نام درکار ہے",
+        amountRequired: "رقم درکار ہے",
+        amountPositive: "رقم صفر سے زیادہ ہونی چاہیے",
+        remainingInvalid: "باقی رقم کل رقم سے زیادہ نہیں ہو سکتی"
+      },
+      calculator: {
+        title: "کیلکولیٹر",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      }
     },
     ps: {
-      backToLedger: "لیجر ته راګرځئ",
-      createNewLedgerEntry: "نوی لیجر داخل جوړ کړئ",
-      createDesc: "د اندازو او پاتې توازن سره د لیجر داخلې اضافه کړئ",
-      ledgerEntrySaved: "د لیجر داخل بریالی شو!",
-      redirectingToLedger: "لیجر ته لیږدول کیږي...",
-      errorSaving: "د لیجر داخل خوندي کولو کې تېروتنه",
+      backToLedger: "بیرته",
+      createNewLedgerEntry: "نوی کھاتہ داخل",
+      createDesc: "د شخص کھاتہ داخل اضافه کړئ",
+      ledgerEntrySaved: "کھاتہ داخل په بریالیتوب سره خوندي شو!",
+      redirectingToLedger: "لیږدول کیږي...",
+      errorSaving: "د کھاتہ خوندي کولو کې تېروتنه",
       date: "نیټه",
-      ledgerEntries: "د لیجر داخلې",
-      addEntry: "داخله اضافه کړئ",
-      description: "تشریح",
-      name: "نوم",
-      amount: "اندازه",
-      remainingAmount: "پاتې اندازه",
-      remainingPersonName: "د پاتې کس نوم",
-      balance: "توازن",
-      totalsByCurrency: "د اسعارو له مخې ټولټال",
+      name: "د شخص نوم",
+      amount: "ټوله اندازه",
+      remainingAmount: "پاتې اندازه (اختیاري)",
+      description: "تشریح (اختیاري)",
+      currency: "اسعار",
       totalAmount: "ټوله اندازه",
-      totalRemaining: "ټول پاتې",
-      netBalance: "خالص توازن",
-      cancel: "لغوه کړئ",
+      totalRemaining: "پاتې",
+      balance: "ادا شوی / ترلاسه شوی",
+      cancel: "لغوه",
       saving: "خوندي کیږي...",
-      saveLedgerEntry: "د لیجر داخل خوندي کړئ",
-      enterDescription: "تشریح دننه کړئ",
-      enterName: "نوم دننه کړئ",
-      enterPersonName: "د کس نوم دننه کړئ",
-      
-      descriptionRequired: "تشریح اړینه ده",
-      nameRequired: "نوم اړین دی",
-      amountRequired: "اندازه اړینه ده",
-      amountGreaterThanZero: "اندازه باید له صفر څخه زیاته وي",
-      remainingAmountRequired: "پاتې اندازه اړینه ده",
-      remainingAmountNegative: "پاتې اندازه منفي نشي کیدی",
-      remainingGreaterThanAmount: "پاتې اندازه د ټولې اندازې څخه زیاته نشي کیدی",
-      remainingPersonRequired: "د پاتې کس نوم اړین دی",
-      
-      amountPlaceholder: "0.00",
-      remainingPlaceholder: "0.00",
-      descriptionPlaceholder: "تشریح دننه کړئ",
-      namePlaceholder: "نوم دننه کړئ",
-      personPlaceholder: "د کس نوم دننه کړئ",
-      
-      active: "فعال",
-      
-      january: "جنوري", february: "فبروري", march: "مارچ", april: "اپریل",
-      may: "مې", june: "جون", july: "جولای", august: "اګست",
-      september: "سپتمبر", october: "اکتوبر", november: "نومبر", december: "دسمبر"
+      saveLedgerEntry: "کھاتہ خوندي کړئ",
+      enterName: "د شخص نوم دننه کړئ",
+      enterDescription: "تشریح دننه کړئ (اختیاري)",
+      enterRemainingAmount: "پاتې اندازه",
+      enterAmount: "ټوله اندازه",
+      required: "*",
+      remainingNote: "که بشپړ اندازه ورکړل شوې / ترلاسه شوې وي خالي پرېږدئ",
+      errors: {
+        nameRequired: "د شخص نوم اړین دی",
+        amountRequired: "اندازه اړینه ده",
+        amountPositive: "اندازه باید له صفر څخه زیاته وي",
+        remainingInvalid: "پاتې اندازه د ټولې اندازې څخه زیاته نشي کیدی"
+      },
+      calculator: {
+        title: "حسابګر",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      }
     },
     fa: {
-      backToLedger: "بازگشت به لجر",
-      createNewLedgerEntry: "ایجاد ورودی جدید لجر",
-      createDesc: "ورودی‌های لجر را با مبالغ و موجودی‌های باقی‌مانده اضافه کنید",
-      ledgerEntrySaved: "ورودی لجر با موفقیت ذخیره شد!",
-      redirectingToLedger: "در حال انتقال به لجر...",
-      errorSaving: "خطا در ذخیره سازی ورودی لجر",
+      backToLedger: "بازگشت",
+      createNewLedgerEntry: "ورودی جدید کھاتا",
+      createDesc: "افزودن ورودی کھاتا برای شخص",
+      ledgerEntrySaved: "ورودی کھاتا با موفقیت ذخیره شد!",
+      redirectingToLedger: "در حال انتقال...",
+      errorSaving: "خطا در ذخیره کھاتا",
       date: "تاریخ",
-      ledgerEntries: "ورودی‌های لجر",
-      addEntry: "افزودن ورودی",
-      description: "توضیحات",
-      name: "نام",
-      amount: "مبلغ",
-      remainingAmount: "مبلغ باقی‌مانده",
-      remainingPersonName: "نام شخص باقی‌مانده",
-      balance: "موجودی",
-      totalsByCurrency: "مجموع بر اساس ارز",
-      totalAmount: "کل مبلغ",
-      totalRemaining: "کل باقی‌مانده",
-      netBalance: "موجودی خالص",
-      cancel: "لغو",
+      name: "نام شخص",
+      amount: "مبلغ کل",
+      remainingAmount: "مبلغ باقی‌مانده (اختیاری)",
+      description: "توضیحات (اختیاری)",
+      currency: "ارز",
+      totalAmount: "مبلغ کل",
+      totalRemaining: "باقی‌مانده",
+      balance: "پرداخت شده / دریافت شده",
+      cancel: "انصراف",
       saving: "در حال ذخیره...",
-      saveLedgerEntry: "ذخیره ورودی لجر",
-      enterDescription: "توضیحات را وارد کنید",
-      enterName: "نام را وارد کنید",
-      enterPersonName: "نام شخص را وارد کنید",
-      
-      descriptionRequired: "توضیحات الزامی است",
-      nameRequired: "نام الزامی است",
-      amountRequired: "مبلغ الزامی است",
-      amountGreaterThanZero: "مبلغ باید بیشتر از صفر باشد",
-      remainingAmountRequired: "مبلغ باقی‌مانده الزامی است",
-      remainingAmountNegative: "مبلغ باقی‌مانده نمی‌تواند منفی باشد",
-      remainingGreaterThanAmount: "مبلغ باقی‌مانده نمی‌تواند بیشتر از مبلغ کل باشد",
-      remainingPersonRequired: "نام شخص باقی‌مانده الزامی است",
-      
-      amountPlaceholder: "0.00",
-      remainingPlaceholder: "0.00",
-      descriptionPlaceholder: "توضیحات را وارد کنید",
-      namePlaceholder: "نام را وارد کنید",
-      personPlaceholder: "نام شخص را وارد کنید",
-      
-      active: "فعال",
-      
-      january: "ژانویه", february: "فوریه", march: "مارس", april: "آوریل",
-      may: "مه", june: "ژوئن", july: "ژوئیه", august: "اوت",
-      september: "سپتامبر", october: "اکتبر", november: "نوامبر", december: "دسامبر"
+      saveLedgerEntry: "ذخیره کھاتا",
+      enterName: "نام شخص را وارد کنید",
+      enterDescription: "توضیحات را وارد کنید (اختیاری)",
+      enterRemainingAmount: "مبلغ باقی‌مانده",
+      enterAmount: "مبلغ کل",
+      required: "*",
+      remainingNote: "اگر مبلغ کامل پرداخت/دریافت شده است خالی بگذارید",
+      errors: {
+        nameRequired: "نام شخص الزامی است",
+        amountRequired: "مبلغ الزامی است",
+        amountPositive: "مبلغ باید بیشتر از صفر باشد",
+        remainingInvalid: "مبلغ باقی‌مانده نمی‌تواند بیشتر از مبلغ کل باشد"
+      },
+      calculator: {
+        title: "ماشین حساب",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      }
     }
   };
 
@@ -252,34 +212,39 @@ const LedgerForm = () => {
   const t = translations[currentLang] || translations.en;
   const isRTL = currentLang === 'ur' || currentLang === 'ps' || currentLang === 'fa';
 
-  // Ledger entries state
-  const [ledgerEntries, setLedgerEntries] = useState([
-    {
-      id: 1,
-      description: '',
-      name: '',
-      amount: '',
-      currency: 'USD',
-      remainingAmount: '',
-      remainingCurrency: 'USD',
-      remainingPersonName: ''
-    }
-  ]);
-
+  // Form state - Single currency for both amount and remaining amount
+  const [formData, setFormData] = useState({
+    name: '',
+    amount: '',
+    remainingAmount: '',
+    description: '',
+    currency: 'USD'
+  });
+  
   const [errors, setErrors] = useState({});
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Get formatted date
   const getFormattedDate = () => {
     const date = new Date();
-    const monthNames = {
-      en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-      ur: [t.january, t.february, t.march, t.april, t.may, t.june, t.july, t.august, t.september, t.october, t.november, t.december],
-      ps: [t.january, t.february, t.march, t.april, t.may, t.june, t.july, t.august, t.september, t.october, t.november, t.december],
-      fa: [t.january, t.february, t.march, t.april, t.may, t.june, t.july, t.august, t.september, t.october, t.november, t.december]
-    };
-    const months = monthNames[currentLang] || monthNames.en;
-    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    return date.toLocaleDateString(currentLang === 'en' ? 'en-US' : 'ur-PK', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  // Get currency symbol
+  const getCurrencySymbol = (code) => {
+    const currency = currencies.find(c => c.code === code);
+    return currency ? currency.symbol : '$';
+  };
+
+  // Calculate balance (amount - remaining)
+  const getBalance = () => {
+    const amount = parseFloat(formData.amount) || 0;
+    const remaining = parseFloat(formData.remainingAmount) || 0;
+    return amount - remaining;
   };
 
   // Handle API errors
@@ -295,53 +260,62 @@ const LedgerForm = () => {
     if (success) {
       setSaveSuccess(true);
       toast.success(t.ledgerEntrySaved);
-      
-      // Reset the ledger entry state
       dispatch({ type: CREATE_LEDGER_ENTRY_RESET });
-      
-      // Redirect after 2 seconds
       setTimeout(() => {
         navigate('/ledger-record');
       }, 2000);
     }
   }, [success, dispatch, navigate, t]);
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      dispatch({ type: CREATE_LEDGER_ENTRY_RESET });
-    };
-  }, [dispatch]);
-
-  // Add new ledger entry
-  const addLedgerEntry = () => {
-    const newId = ledgerEntries.length + 1;
-    const newEntry = {
-      id: newId,
-      description: '',
-      name: '',
-      amount: '',
-      currency: 'USD',
-      remainingAmount: '',
-      remainingCurrency: 'USD',
-      remainingPersonName: ''
-    };
-    
-    setLedgerEntries([...ledgerEntries, newEntry]);
-  };
-
-  // Remove ledger entry
-  const removeLedgerEntry = (id) => {
-    if (ledgerEntries.length > 1) {
-      setLedgerEntries(ledgerEntries.filter(entry => entry.id !== id));
+  // Update form field
+  const updateField = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
-  // Update ledger entry
-  const updateLedgerEntry = (id, field, value) => {
-    setLedgerEntries(ledgerEntries.map(entry => 
-      entry.id === id ? { ...entry, [field]: value } : entry
-    ));
+  // Calculator functions
+  const evaluateExpression = (expr) => {
+    try {
+      let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
+      const result = Function('return (' + expression + ')')();
+      return result;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const handleCalculatorButton = (value) => {
+    if (value === 'C') {
+      setCalculatorInput('');
+      setCalculatorExpression('');
+    } else if (value === '⌫') {
+      setCalculatorInput(prev => prev.slice(0, -1));
+      setCalculatorExpression(prev => prev.slice(0, -1));
+    } else if (value === '=') {
+      const result = evaluateExpression(calculatorExpression || calculatorInput);
+      if (result !== null && !isNaN(result)) {
+        const rounded = Math.round(result * 100) / 100;
+        setCalculatorInput(rounded.toString());
+        setCalculatorExpression(rounded.toString());
+        if (activeField) {
+          updateField(activeField, rounded.toString());
+        }
+        setShowCalculator(false);
+        setActiveField(null);
+      }
+    } else {
+      setCalculatorInput(prev => prev + value);
+      setCalculatorExpression(prev => prev + value);
+    }
+  };
+
+  const openCalculator = (field, currentValue) => {
+    setActiveField(field);
+    setCalculatorInput(currentValue || '');
+    setCalculatorExpression(currentValue || '');
+    setShowCalculator(true);
   };
 
   // Validate form
@@ -349,130 +323,95 @@ const LedgerForm = () => {
     const newErrors = {};
     let hasError = false;
 
-    ledgerEntries.forEach((entry) => {
-      if (!entry.description) {
-        newErrors[`desc_${entry.id}`] = t.descriptionRequired;
-        hasError = true;
-      }
-      if (!entry.name) {
-        newErrors[`name_${entry.id}`] = t.nameRequired;
-        hasError = true;
-      }
-      if (!entry.amount) {
-        newErrors[`amount_${entry.id}`] = t.amountRequired;
-        hasError = true;
-      } else if (parseFloat(entry.amount) <= 0) {
-        newErrors[`amount_${entry.id}`] = t.amountGreaterThanZero;
-        hasError = true;
-      }
-      if (!entry.remainingAmount) {
-        newErrors[`remaining_${entry.id}`] = t.remainingAmountRequired;
-        hasError = true;
-      } else if (parseFloat(entry.remainingAmount) < 0) {
-        newErrors[`remaining_${entry.id}`] = t.remainingAmountNegative;
-        hasError = true;
-      }
-      if (parseFloat(entry.remainingAmount) > parseFloat(entry.amount)) {
-        newErrors[`remaining_${entry.id}`] = t.remainingGreaterThanAmount;
-        hasError = true;
-      }
-      if (!entry.remainingPersonName) {
-        newErrors[`remaining_person_${entry.id}`] = t.remainingPersonRequired;
-        hasError = true;
-      }
-    });
+    if (!formData.name.trim()) {
+      newErrors.name = t.errors.nameRequired;
+      hasError = true;
+    }
+    
+    if (!formData.amount) {
+      newErrors.amount = t.errors.amountRequired;
+      hasError = true;
+    } else if (parseFloat(formData.amount) <= 0) {
+      newErrors.amount = t.errors.amountPositive;
+      hasError = true;
+    }
+    
+    if (formData.remainingAmount && parseFloat(formData.remainingAmount) > parseFloat(formData.amount)) {
+      newErrors.remainingAmount = t.errors.remainingInvalid;
+      hasError = true;
+    }
 
-    return { newErrors, hasError };
+    setErrors(newErrors);
+    return !hasError;
   };
 
   // Handle form submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { newErrors, hasError } = validateForm();
     
-    if (!hasError) {
-      // Prepare data for API - send as array if multiple entries
-      let dataToSend;
+    if (validateForm()) {
+      const dataToSend = {
+        name: formData.name,
+        amount: parseFloat(formData.amount),
+        description: formData.description || '',
+        currency: formData.currency,
+        remainingAmount: formData.remainingAmount ? parseFloat(formData.remainingAmount) : parseFloat(formData.amount),
+        status: 'active'
+      };
       
-      if (ledgerEntries.length === 1) {
-        // Single entry - send as object
-        dataToSend = {
-          description: ledgerEntries[0].description,
-          name: ledgerEntries[0].name,
-          amount: parseFloat(ledgerEntries[0].amount),
-          currency: ledgerEntries[0].currency,
-          remainingAmount: parseFloat(ledgerEntries[0].remainingAmount),
-          remainingCurrency: ledgerEntries[0].remainingCurrency,
-          remainingPersonName: ledgerEntries[0].remainingPersonName,
-          status: 'active'
-        };
-      } else {
-        // Multiple entries - send as array
-        dataToSend = ledgerEntries.map(entry => ({
-          description: entry.description,
-          name: entry.name,
-          amount: parseFloat(entry.amount),
-          currency: entry.currency,
-          remainingAmount: parseFloat(entry.remainingAmount),
-          remainingCurrency: entry.remainingCurrency,
-          remainingPersonName: entry.remainingPersonName,
-          status: 'active'
-        }));
-      }
-      
-      // Dispatch create action
       dispatch(createLedgerEntryAction(dataToSend));
-    } else {
-      setErrors(newErrors);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  // Calculate total for an entry (amount - remaining)
-  const calculateBalance = (entry) => {
-    const amount = parseFloat(entry.amount) || 0;
-    const remaining = parseFloat(entry.remainingAmount) || 0;
-    return amount - remaining;
+  const CalculatorButton = ({ children, onClick, variant = 'number' }) => {
+    const getBgColor = () => {
+      if (variant === 'operator') return 'bg-blue-100 text-blue-600 active:bg-blue-200';
+      if (variant === 'clear') return 'bg-gray-200 text-gray-700 active:bg-gray-300';
+      return 'bg-gray-100 text-gray-700 active:bg-gray-200';
+    };
+
+    return (
+      <button
+        onClick={onClick}
+        className={`p-4 text-xl font-medium rounded-xl transition-colors ${getBgColor()}`}
+      >
+        {children}
+      </button>
+    );
   };
 
-  // Get currency symbol
-  const getCurrencySymbol = (code) => {
-    const currency = currencies.find(c => c.code === code);
-    return currency ? currency.symbol : code;
-  };
+  const balance = getBalance();
+  const isPositive = balance >= 0;
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Main Content - Full width */}
-      <main className="p-4 lg:p-8">
-        {/* Header */}
-        <div className="mb-6">
-          <Link
-            to="/ledger-record"
-            className={`inline-flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors mb-4 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}
-          >
-            <ArrowLeft size={18} className={isRTL ? 'rotate-180' : ''} />
-            <span>{t.backToLedger}</span>
+    <div className="min-h-screen bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <Link to="/ledger-record" className="p-2 -ml-2 active:bg-gray-100 rounded-full">
+            <ArrowLeft size={24} className="text-gray-600" />
           </Link>
-          
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-            {t.createNewLedgerEntry}
-          </h1>
-          <p className="text-gray-600 mt-1">{t.createDesc}</p>
+          <div className="text-center">
+            <h1 className="text-lg font-bold text-gray-800">{t.createNewLedgerEntry}</h1>
+            <p className="text-xs text-gray-500">{t.createDesc}</p>
+          </div>
+          <div className="w-10" />
         </div>
+      </div>
 
+      <main className="p-4 pb-32">
         {/* Success Message */}
         {saveSuccess && (
-          <div className={`mb-6 p-4 bg-green-100 border border-green-300 rounded-xl flex items-center space-x-3 animate-fadeIn ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
-            <CheckCircle className="w-5 h-5 text-green-600" />
+          <div className="mb-4 p-4 bg-green-100 border border-green-300 rounded-2xl flex items-center gap-3 animate-fadeIn">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
             <div>
               <p className="text-green-700 font-medium">{t.ledgerEntrySaved}</p>
               <p className="text-sm text-green-600">{t.redirectingToLedger}</p>
@@ -482,8 +421,8 @@ const LedgerForm = () => {
 
         {/* Error Message */}
         {error && !saveSuccess && (
-          <div className={`mb-6 p-4 bg-red-100 border border-red-300 rounded-xl flex items-center space-x-3 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
-            <AlertCircle className="w-5 h-5 text-red-600" />
+          <div className="mb-4 p-4 bg-red-100 border border-red-300 rounded-2xl flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
             <div>
               <p className="text-red-700 font-medium">{t.errorSaving}</p>
               <p className="text-sm text-red-600">{error}</p>
@@ -491,302 +430,275 @@ const LedgerForm = () => {
           </div>
         )}
 
-        {/* Main Form */}
-        <div className="bg-white rounded-3xl shadow-2xl p-6 lg:p-8 border border-gray-200">
-          <form onSubmit={handleSubmit}>
-            {/* Date Display */}
-            <div className={`mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200`}>
-              <div className={`flex items-center space-x-2 text-gray-700 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                <Calendar size={18} className="text-green-600" />
-                <span className="font-medium">{t.date}:</span>
-                <span>{getFormattedDate()}</span>
+        {/* Date Display */}
+        <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2">
+            <Calendar size={18} className="text-blue-500" />
+            <span className="text-sm text-gray-500">{t.date}:</span>
+            <span className="text-sm font-medium text-gray-700">{getFormattedDate()}</span>
+          </div>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-blue-100 overflow-hidden">
+          <div className="p-4 space-y-4">
+            {/* Name - Required */}
+            <div>
+              <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                {t.name} <span className="text-red-500 text-xs">{t.required}</span>
+              </label>
+              <div className="relative">
+                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => updateField('name', e.target.value)}
+                  className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                    errors.name
+                      ? 'border-red-500 focus:ring-red-500/20'
+                      : 'border-gray-200 focus:ring-blue-500/20 focus:border-blue-500'
+                  }`}
+                  placeholder={t.enterName}
+                />
               </div>
+              {errors.name && (
+                <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+              )}
             </div>
 
-            {/* Ledger Entries Section */}
-            <div className="mb-8">
-              <div className={`flex items-center justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                <h2 className={`text-xl font-bold text-gray-900 flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-                  <BookOpen className="w-5 h-5 mr-2 text-green-600" />
-                  {t.ledgerEntries}
-                </h2>
-                <button
-                  type="button"
-                  onClick={addLedgerEntry}
-                  className={`bg-green-100 text-green-600 px-4 py-2 rounded-xl hover:bg-green-200 transition-colors flex items-center space-x-2 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}
+            {/* Currency - Single selection for both amount and remaining amount */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1.5 block">
+                {t.currency}
+              </label>
+              <div className="relative">
+                <select
+                  value={formData.currency}
+                  onChange={(e) => updateField('currency', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none bg-white"
                 >
-                  <Plus size={16} />
-                  <span>{t.addEntry}</span>
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                {ledgerEntries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="bg-blue-50 p-5 rounded-xl border border-blue-200 relative"
-                  >
-                    {ledgerEntries.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeLedgerEntry(entry.id)}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors z-10"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {/* Description */}
-                      <div>
-                        <label className={`block text-sm font-medium text-gray-700 mb-1 ${isRTL ? 'text-right' : ''}`}>
-                          {t.description} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <FileText className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400`} size={16} />
-                          <input
-                            type="text"
-                            value={entry.description}
-                            onChange={(e) => updateLedgerEntry(entry.id, 'description', e.target.value)}
-                            className={`w-full ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'} py-2 border ${
-                              errors[`desc_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                            } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                            placeholder={t.descriptionPlaceholder}
-                          />
-                        </div>
-                        {errors[`desc_${entry.id}`] && (
-                          <p className={`mt-1 text-xs text-red-600 ${isRTL ? 'text-right' : ''}`}>{errors[`desc_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Name */}
-                      <div>
-                        <label className={`block text-sm font-medium text-gray-700 mb-1 ${isRTL ? 'text-right' : ''}`}>
-                          {t.name} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <User className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400`} size={16} />
-                          <input
-                            type="text"
-                            value={entry.name}
-                            onChange={(e) => updateLedgerEntry(entry.id, 'name', e.target.value)}
-                            className={`w-full ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'} py-2 border ${
-                              errors[`name_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                            } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                            placeholder={t.namePlaceholder}
-                          />
-                        </div>
-                        {errors[`name_${entry.id}`] && (
-                          <p className={`mt-1 text-xs text-red-600 ${isRTL ? 'text-right' : ''}`}>{errors[`name_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Amount with Currency */}
-                      <div>
-                        <label className={`block text-sm font-medium text-gray-700 mb-1 ${isRTL ? 'text-right' : ''}`}>
-                          {t.amount} <span className="text-red-500">*</span>
-                        </label>
-                        <div className={`flex space-x-2 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                          <div className="flex-1">
-                            <input
-                              type="number"
-                              value={entry.amount}
-                              onChange={(e) => updateLedgerEntry(entry.id, 'amount', e.target.value)}
-                              className={`w-full px-3 py-2 border ${
-                                errors[`amount_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                              } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 ${isRTL ? 'text-right' : ''}`}
-                              placeholder={t.amountPlaceholder}
-                              step="0.01"
-                            />
-                          </div>
-                          <div className="w-24">
-                            <select
-                              value={entry.currency}
-                              onChange={(e) => updateLedgerEntry(entry.id, 'currency', e.target.value)}
-                              className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-                            >
-                              {currencies.map(currency => (
-                                <option key={currency.code} value={currency.code}>
-                                  {currency.code}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        {errors[`amount_${entry.id}`] && (
-                          <p className={`mt-1 text-xs text-red-600 ${isRTL ? 'text-right' : ''}`}>{errors[`amount_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Remaining Amount with Currency */}
-                      <div>
-                        <label className={`block text-sm font-medium text-gray-700 mb-1 ${isRTL ? 'text-right' : ''}`}>
-                          {t.remainingAmount} <span className="text-red-500">*</span>
-                        </label>
-                        <div className={`flex space-x-2 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                          <div className="flex-1">
-                            <input
-                              type="number"
-                              value={entry.remainingAmount}
-                              onChange={(e) => updateLedgerEntry(entry.id, 'remainingAmount', e.target.value)}
-                              className={`w-full px-3 py-2 border ${
-                                errors[`remaining_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                              } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 ${isRTL ? 'text-right' : ''}`}
-                              placeholder={t.remainingPlaceholder}
-                              step="0.01"
-                            />
-                          </div>
-                          <div className="w-24">
-                            <select
-                              value={entry.remainingCurrency}
-                              onChange={(e) => updateLedgerEntry(entry.id, 'remainingCurrency', e.target.value)}
-                              className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-                            >
-                              {currencies.map(currency => (
-                                <option key={currency.code} value={currency.code}>
-                                  {currency.code}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                        {errors[`remaining_${entry.id}`] && (
-                          <p className={`mt-1 text-xs text-red-600 ${isRTL ? 'text-right' : ''}`}>{errors[`remaining_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Remaining Person Name */}
-                      <div>
-                        <label className={`block text-sm font-medium text-gray-700 mb-1 ${isRTL ? 'text-right' : ''}`}>
-                          {t.remainingPersonName} <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <User className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400`} size={16} />
-                          <input
-                            type="text"
-                            value={entry.remainingPersonName}
-                            onChange={(e) => updateLedgerEntry(entry.id, 'remainingPersonName', e.target.value)}
-                            className={`w-full ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'} py-2 border ${
-                              errors[`remaining_person_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                            } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                            placeholder={t.personPlaceholder}
-                          />
-                        </div>
-                        {errors[`remaining_person_${entry.id}`] && (
-                          <p className={`mt-1 text-xs text-red-600 ${isRTL ? 'text-right' : ''}`}>{errors[`remaining_person_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Balance Display */}
-                      <div className="bg-gray-100 p-3 rounded-lg flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">{t.balance}:</span>
-                        <span className={`font-bold ${calculateBalance(entry) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {getCurrencySymbol(entry.currency)} {calculateBalance(entry).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Totals Section - Per Currency */}
-              <div className="mt-6">
-                <h3 className={`text-lg font-semibold text-gray-900 mb-3 ${isRTL ? 'text-right' : ''}`}>{t.totalsByCurrency}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(() => {
-                    const totalsByCurrency = {};
-                    
-                    ledgerEntries.forEach(entry => {
-                      const currency = entry.currency;
-                      const amount = parseFloat(entry.amount) || 0;
-                      if (!totalsByCurrency[currency]) {
-                        totalsByCurrency[currency] = { amount: 0, remaining: 0 };
-                      }
-                      totalsByCurrency[currency].amount += amount;
-                    });
-                    
-                    ledgerEntries.forEach(entry => {
-                      const currency = entry.remainingCurrency;
-                      const remaining = parseFloat(entry.remainingAmount) || 0;
-                      if (totalsByCurrency[currency]) {
-                        totalsByCurrency[currency].remaining = (totalsByCurrency[currency].remaining || 0) + remaining;
-                      } else {
-                        totalsByCurrency[currency] = { amount: 0, remaining: remaining };
-                      }
-                    });
-                    
-                    return Object.entries(totalsByCurrency).map(([currency, totals]) => (
-                      <div key={currency} className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-                        <div className={`flex items-center justify-between mb-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                          <span className="text-lg font-bold">{currency}</span>
-                          <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
-                            {currencies.find(c => c.code === currency)?.name || currency}
-                          </span>
-                        </div>
-                        <div className="space-y-2">
-                          <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                            <span className="text-sm text-gray-600">{t.totalAmount}:</span>
-                            <span className="font-semibold text-green-600">
-                              {getCurrencySymbol(currency)} {totals.amount.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className={`flex justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
-                            <span className="text-sm text-gray-600">{t.totalRemaining}:</span>
-                            <span className="font-semibold text-blue-600">
-                              {getCurrencySymbol(currency)} {totals.remaining.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className={`flex justify-between pt-2 border-t border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                            <span className="text-sm font-medium text-gray-700">{t.netBalance}:</span>
-                            <span className="font-bold text-purple-600">
-                              {getCurrencySymbol(currency)} {(totals.amount - totals.remaining).toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ));
-                  })()}
+                  {currencies.map(currency => (
+                    <option key={currency.code} value={currency.code}>
+                      {currency.flag} {currency.code} - {currency.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <div className="w-2 h-2 border-r border-b border-gray-400 rotate-45" />
                 </div>
               </div>
             </div>
 
-            {/* Form Actions */}
-            <div className={`flex space-x-3 pt-4 border-t border-gray-200 ${isRTL ? 'flex-row-reverse space-x-reverse justify-start' : 'justify-end'}`}>
-              <Link
-                to="/ledger-record"
-                className="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-medium"
-              >
-                {t.cancel}
-              </Link>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 font-medium flex items-center space-x-2 disabled:opacity-50 ${isRTL ? 'flex-row-reverse space-x-reverse' : ''}`}
-              >
-                {loading ? (
-                  <>
-                    <RefreshCw size={18} className="animate-spin" />
-                    <span>{t.saving}</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} />
-                    <span>{t.saveLedgerEntry}</span>
-                  </>
-                )}
-              </button>
+            {/* Amount - Required with Calculator */}
+            <div>
+              <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                {t.amount} <span className="text-red-500 text-xs">{t.required}</span>
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    type="number"
+                    value={formData.amount}
+                    onChange={(e) => updateField('amount', e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                      errors.amount
+                        ? 'border-red-500 focus:ring-red-500/20'
+                        : 'border-gray-200 focus:ring-blue-500/20 focus:border-blue-500'
+                    }`}
+                    placeholder={t.enterAmount}
+                    step="0.01"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    {getCurrencySymbol(formData.currency)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openCalculator('amount', formData.amount)}
+                  className="px-4 py-3 bg-blue-100 text-blue-600 rounded-xl active:bg-blue-200 transition-colors"
+                >
+                  <Calculator size={20} />
+                </button>
+              </div>
+              {errors.amount && (
+                <p className="mt-1 text-xs text-red-500">{errors.amount}</p>
+              )}
             </div>
-          </form>
+
+            {/* Remaining Amount - Optional with Calculator (same currency as amount) */}
+            <div>
+              <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                {t.remainingAmount}
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    type="number"
+                    value={formData.remainingAmount}
+                    onChange={(e) => updateField('remainingAmount', e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                      errors.remainingAmount
+                        ? 'border-red-500 focus:ring-red-500/20'
+                        : 'border-gray-200 focus:ring-blue-500/20 focus:border-blue-500'
+                    }`}
+                    placeholder={t.enterRemainingAmount}
+                    step="0.01"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    {getCurrencySymbol(formData.currency)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openCalculator('remainingAmount', formData.remainingAmount)}
+                  className="px-4 py-3 bg-blue-100 text-blue-600 rounded-xl active:bg-blue-200 transition-colors"
+                >
+                  <Calculator size={20} />
+                </button>
+              </div>
+              {errors.remainingAmount && (
+                <p className="mt-1 text-xs text-red-500">{errors.remainingAmount}</p>
+              )}
+              <p className="mt-1 text-xs text-gray-400">{t.remainingNote}</p>
+            </div>
+
+            {/* Description - Optional */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1.5 block">
+                {t.description}
+              </label>
+              <div className="relative">
+                <FileText size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => updateField('description', e.target.value)}
+                  className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  placeholder={t.enterDescription}
+                />
+              </div>
+            </div>
+
+            {/* Balance Summary */}
+            {formData.amount && (
+              <div className={`mt-2 p-4 rounded-xl ${isPositive ? 'bg-green-50' : 'bg-red-50'}`}>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-600">{t.balance}:</span>
+                  <span className={`text-lg font-bold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                    {getCurrencySymbol(formData.currency)} {Math.abs(balance).toFixed(2)}
+                    {!isPositive && ' (Due)'}
+                  </span>
+                </div>
+                {formData.remainingAmount && (
+                  <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
+                    <span className="text-sm text-gray-500">{t.totalRemaining}:</span>
+                    <span className="text-sm font-medium text-orange-600">
+                      {getCurrencySymbol(formData.currency)} {parseFloat(formData.remainingAmount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
+
+        <div className="h-4" />
       </main>
 
-      <style jsx>{`
+      {/* Fixed Save Button */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-lg z-20">
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+          {loading ? (
+            <>
+              <RefreshCw size={18} className="animate-spin" />
+              <span>{t.saving}</span>
+            </>
+          ) : (
+            <>
+              <Save size={18} />
+              <span>{t.saveLedgerEntry}</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Calculator Modal */}
+      {showCalculator && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center animate-fadeIn">
+          <div className="bg-white rounded-t-3xl w-full max-w-md animate-slideUp">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-800">{t.calculator.title}</h3>
+              <button onClick={() => setShowCalculator(false)} className="p-2 active:bg-gray-100 rounded-full">
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-gray-50">
+              <div className="bg-white rounded-xl p-4 shadow-inner">
+                <p className="text-right text-gray-400 text-sm min-h-[20px]">{calculatorExpression}</p>
+                <p className="text-right text-3xl font-bold text-gray-800 mt-1">{calculatorInput || '0'}</p>
+              </div>
+            </div>
+
+            <div className="p-4">
+              <div className="grid grid-cols-4 gap-2">
+                <CalculatorButton onClick={() => handleCalculatorButton('7')}>7</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('8')}>8</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('9')}>9</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('÷')} variant="operator">÷</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('4')}>4</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('5')}>5</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('6')}>6</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('×')} variant="operator">×</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('1')}>1</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('2')}>2</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('3')}>3</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('-')} variant="operator">-</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('0')}>0</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('.')}>.</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('C')} variant="clear">C</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('+')} variant="operator">+</CalculatorButton>
+
+                <button
+                  onClick={() => handleCalculatorButton('⌫')}
+                  className="p-4 text-xl font-medium text-gray-700 bg-gray-100 rounded-xl active:bg-gray-200 transition-colors col-span-2 flex items-center justify-center gap-2"
+                >
+                  <Delete size={18} />
+                  <span>{t.calculator.backspace}</span>
+                </button>
+                <button
+                  onClick={() => handleCalculatorButton('=')}
+                  className="p-4 text-xl font-bold rounded-xl transition-colors col-span-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white active:from-blue-600 active:to-blue-700"
+                >
+                  {t.calculator.calculate}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.2s ease-out;
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
         }
       `}</style>
     </div>

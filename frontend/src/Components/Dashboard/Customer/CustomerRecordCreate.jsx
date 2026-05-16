@@ -3,33 +3,17 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   User,
-  Mail,
-  Phone,
-  MapPin,
   DollarSign,
-  Euro,
-  Wallet,
-  Percent,
-  Receipt,
   Save,
   ArrowLeft,
   X,
-  Plus,
-  Minus,
-  Globe,
-  Building,
-  Home,
-  Briefcase,
-  CreditCard,
-  Landmark,
-  TrendingUp,
   Calculator,
   CheckCircle,
   AlertCircle,
-  Info,
-  HelpCircle
+  RefreshCw,
+  TrendingUp,
+  TrendingDown
 } from 'lucide-react';
-import { Country, State, City } from "country-state-city";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { createTransactionAction, clearErrors } from "../../../actions/transactionActions";
@@ -42,369 +26,224 @@ const CustomerRecordCreate = () => {
   // Get state from Redux
   const { loading, error, success } = useSelector((state) => state.newTransaction);
   
-  const [currentStep, setCurrentStep] = useState(1);
+  // Language state
+  const [currentLang, setCurrentLang] = useState('en');
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorInput, setCalculatorInput] = useState('');
+  const [calculatorExpression, setCalculatorExpression] = useState('');
+  const [activeField, setActiveField] = useState(null);
+
+  // Simple form state - only essential fields
   const [formData, setFormData] = useState({
-    // Customer Information
+    // Customer Name (required)
     name: '',
     
-    // Sender Details
-    senderEmail: '',
-    senderPhone: '',
-    senderCurrency: 'USD',
+    // Sender (who sends money from another country)
+    senderName: '',
     senderAmount: '',
-    senderCountry: '',
-    senderState: '',
-    senderCity: '',
-    senderAddress: '',
+    senderCurrency: 'USD',
     
-    // Receiver Details
-    receiverEmail: '',
-    receiverPhone: '',
+    // Receiver (who gets money in Pakistan)
+    receiverName: '',
     receiverCurrency: 'PKR',
-    receiverAmount: '',
-    receiverCountry: '',
-    receiverState: '',
-    receiverCity: '',
-    receiverAddress: '',
     
-    // Fees & Charges
-    commission: '',
-    fee: '',
-    tax: '',
+    // Exchange Rate (required)
     exchangeRate: '',
-    notes: '',
     
-    // Status
-    status: 'pending'
+    // Optional description
+    description: ''
   });
 
   const [errors, setErrors] = useState({});
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [calculatedAmount, setCalculatedAmount] = useState(null);
-  
-  // Country, State, City states
-  const [countries] = useState(Country.getAllCountries());
-  const [senderStates, setSenderStates] = useState([]);
-  const [receiverStates, setReceiverStates] = useState([]);
-  const [senderCities, setSenderCities] = useState([]);
-  const [receiverCities, setReceiverCities] = useState([]);
+  const [calculatedReceiverAmount, setCalculatedReceiverAmount] = useState(null);
+
+  // Currencies list
+  const currencies = [
+    { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸' },
+    { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺' },
+    { code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧' },
+    { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪' },
+    { code: 'SAR', name: 'Saudi Riyal', symbol: 'ر.س', flag: '🇸🇦' },
+    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', flag: '🇨🇦' },
+    { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', flag: '🇦🇺' },
+    { code: 'PKR', name: 'Pakistani Rupee', symbol: '₨', flag: '🇵🇰' }
+  ];
 
   // Language translations
   const translations = {
     en: {
-      backToCustomerRegistration: "Back to Customer Registration",
-      newCustomerRecord: "New Customer Record",
-      createSubtitle: "Create a new currency exchange transaction record",
-      transactionSaved: "Transaction saved successfully!",
-      redirecting: "Redirecting to customer registration...",
-      errorSaving: "Error saving transaction",
-      customerInfo: "Customer Info",
-      address: "Address",
-      transaction: "Transaction",
-      customerInformation: "Customer Information",
+      back: "Back",
+      title: "New Transaction",
+      subtitle: "Add currency exchange record",
+      saved: "Transaction saved!",
+      redirecting: "Redirecting...",
+      error: "Error saving",
       customerName: "Customer Name",
-      enterFullName: "Enter customer full name",
-      senderDetails: "Sender Details",
-      receiverDetails: "Receiver Details",
-      email: "Email",
-      phone: "Phone",
-      emailPlaceholder: "email@example.com",
-      phonePlaceholder: "+92 300 1234567",
-      addressInformation: "Address Information",
-      senderAddress: "Sender Address",
-      receiverAddress: "Receiver Address",
-      country: "Country",
-      selectCountry: "Select country",
-      stateProvince: "State/Province",
-      selectState: "Select state",
-      city: "City",
-      selectCity: "Select city",
-      addressLine: "Address",
-      addressPlaceholder: "Street address, building, etc.",
-      transactionDetails: "Transaction Details",
-      currencyExchange: "Currency Exchange",
-      senderCurrency: "Sender Currency",
-      receiverCurrency: "Receiver Currency",
-      senderAmount: "Sender Amount",
+      enterName: "Enter customer name",
+      sender: "Sender (From Abroad)",
+      senderName: "Sender Name",
+      enterSenderName: "Enter sender name",
+      amount: "Amount",
+      enterAmount: "0.00",
+      currency: "Currency",
+      receiver: "Receiver (In Pakistan)",
+      receiverName: "Receiver Name",
+      enterReceiverName: "Enter receiver name",
       exchangeRate: "Exchange Rate",
-      calculatedBreakdown: "Calculated Amount Breakdown",
-      baseAmount: "Base Amount:",
-      totalFees: "Total Fees (Commission + Fee + Tax):",
-      finalAmount: "Final Amount to Receive:",
-      feesCharges: "Fees & Charges",
-      commission: "Commission",
-      exchangeFee: "Exchange Fee",
-      tax: "Tax",
-      status: "Status",
-      notes: "Notes (Optional)",
-      notesPlaceholder: "Additional notes",
-      nextStep: "Next Step",
-      previous: "Previous",
-      saveRecord: "Save Record",
+      rateHint: "1 USD = ? PKR",
+      description: "Description (Optional)",
+      enterDescription: "Add notes",
+      save: "Save",
       saving: "Saving...",
       required: "*",
-      errors: {
-        customerNameRequired: "Customer name is required",
-        senderEmailRequired: "Sender email is required",
-        invalidEmail: "Invalid email format",
-        senderPhoneRequired: "Sender phone is required",
-        receiverEmailRequired: "Receiver email is required",
-        receiverPhoneRequired: "Receiver phone is required",
-        senderCountryRequired: "Sender country is required",
-        senderAddressRequired: "Sender address is required",
-        receiverCountryRequired: "Receiver country is required",
-        receiverAddressRequired: "Receiver address is required",
-        senderCurrencyRequired: "Sender currency is required",
-        receiverCurrencyRequired: "Receiver currency is required",
-        senderAmountRequired: "Sender amount is required",
-        amountGreaterThanZero: "Amount must be greater than 0",
-        exchangeRateRequired: "Exchange rate is required",
-        exchangeRateGreaterThanZero: "Exchange rate must be greater than 0"
+      receiverGets: "Receiver gets:",
+      calculator: {
+        title: "Calculator",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
       },
-      statusOptions: {
-        pending: "Pending",
-        processing: "Processing",
-        completed: "Completed",
-        cancelled: "Cancelled"
+      errors: {
+        nameRequired: "Customer name required",
+        senderNameRequired: "Sender name required",
+        senderAmountRequired: "Amount required",
+        amountPositive: "Amount must be positive",
+        receiverNameRequired: "Receiver name required",
+        exchangeRateRequired: "Exchange rate required",
+        ratePositive: "Rate must be positive"
       }
     },
     ur: {
-      backToCustomerRegistration: "کسٹمر رجسٹریشن پر واپس جائیں",
-      newCustomerRecord: "نیا کسٹمر ریکارڈ",
-      createSubtitle: "کرنسی ایکسچینج کا نیا لین دین ریکارڈ بنائیں",
-      transactionSaved: "لین دین کامیابی سے محفوظ ہو گیا!",
-      redirecting: "کسٹمر رجسٹریشن پر جا رہے ہیں...",
-      errorSaving: "لین دین محفوظ کرنے میں خرابی",
-      customerInfo: "کسٹمر کی معلومات",
-      address: "پتہ",
-      transaction: "لین دین",
-      customerInformation: "کسٹمر کی معلومات",
+      back: "واپس",
+      title: "نیا لین دین",
+      subtitle: "کرنسی ایکسچینج ریکارڈ شامل کریں",
+      saved: "لین دین محفوظ ہوگیا!",
+      redirecting: "جا رہے ہیں...",
+      error: "محفوظ کرنے میں خرابی",
       customerName: "کسٹمر کا نام",
-      enterFullName: "کسٹمر کا مکمل نام درج کریں",
-      senderDetails: "بھیجنے والے کی تفصیلات",
-      receiverDetails: "وصول کنندہ کی تفصیلات",
-      email: "ای میل",
-      phone: "فون",
-      emailPlaceholder: "email@example.com",
-      phonePlaceholder: "+92 300 1234567",
-      addressInformation: "پتے کی معلومات",
-      senderAddress: "بھیجنے والے کا پتہ",
-      receiverAddress: "وصول کنندہ کا پتہ",
-      country: "ملک",
-      selectCountry: "ملک منتخب کریں",
-      stateProvince: "ریاست/صوبہ",
-      selectState: "ریاست منتخب کریں",
-      city: "شہر",
-      selectCity: "شہر منتخب کریں",
-      addressLine: "پتہ",
-      addressPlaceholder: "گلی کا پتہ، عمارت، وغیرہ",
-      transactionDetails: "لین دین کی تفصیلات",
-      currencyExchange: "کرنسی کا تبادلہ",
-      senderCurrency: "بھیجنے والے کی کرنسی",
-      receiverCurrency: "وصول کنندہ کی کرنسی",
-      senderAmount: "بھیجنے والی رقم",
+      enterName: "کسٹمر کا نام درج کریں",
+      sender: "بھیجنے والا (بیرون ملک)",
+      senderName: "بھیجنے والے کا نام",
+      enterSenderName: "بھیجنے والے کا نام درج کریں",
+      amount: "رقم",
+      enterAmount: "0.00",
+      currency: "کرنسی",
+      receiver: "وصول کنندہ (پاکستان میں)",
+      receiverName: "وصول کنندہ کا نام",
+      enterReceiverName: "وصول کنندہ کا نام درج کریں",
       exchangeRate: "تبادلے کی شرح",
-      calculatedBreakdown: "حساب شدہ رقم کی تقسیم",
-      baseAmount: "بنیادی رقم:",
-      totalFees: "کل فیس (کمیشن + فیس + ٹیکس):",
-      finalAmount: "وصول کرنے کے لیے حتمی رقم:",
-      feesCharges: "فیس اور چارجز",
-      commission: "کمیشن",
-      exchangeFee: "تبادلے کی فیس",
-      tax: "ٹیکس",
-      status: "حالت",
-      notes: "نوٹس (اختیاری)",
-      notesPlaceholder: "اضافی نوٹس",
-      nextStep: "اگلا مرحلہ",
-      previous: "پچھلا",
-      saveRecord: "ریکارڈ محفوظ کریں",
+      rateHint: "1 USD = ? PKR",
+      description: "تفصیل (اختیاری)",
+      enterDescription: "نوٹ شامل کریں",
+      save: "محفوظ",
       saving: "محفوظ ہو رہا ہے...",
       required: "*",
-      errors: {
-        customerNameRequired: "کسٹمر کا نام درکار ہے",
-        senderEmailRequired: "بھیجنے والے کی ای میل درکار ہے",
-        invalidEmail: "غلط ای میل فارمیٹ",
-        senderPhoneRequired: "بھیجنے والے کا فون درکار ہے",
-        receiverEmailRequired: "وصول کنندہ کی ای میل درکار ہے",
-        receiverPhoneRequired: "وصول کنندہ کا فون درکار ہے",
-        senderCountryRequired: "بھیجنے والے کا ملک درکار ہے",
-        senderAddressRequired: "بھیجنے والے کا پتہ درکار ہے",
-        receiverCountryRequired: "وصول کنندہ کا ملک درکار ہے",
-        receiverAddressRequired: "وصول کنندہ کا پتہ درکار ہے",
-        senderCurrencyRequired: "بھیجنے والے کی کرنسی درکار ہے",
-        receiverCurrencyRequired: "وصول کنندہ کی کرنسی درکار ہے",
-        senderAmountRequired: "بھیجنے والی رقم درکار ہے",
-        amountGreaterThanZero: "رقم صفر سے زیادہ ہونی چاہیے",
-        exchangeRateRequired: "تبادلے کی شرح درکار ہے",
-        exchangeRateGreaterThanZero: "تبادلے کی شرح صفر سے زیادہ ہونی چاہیے"
+      receiverGets: "وصول کنندہ کو ملے گا:",
+      calculator: {
+        title: "کیلکولیٹر",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
       },
-      statusOptions: {
-        pending: "زیر التواء",
-        processing: "پروسیسنگ",
-        completed: "مکمل شدہ",
-        cancelled: "منسوخ شدہ"
+      errors: {
+        nameRequired: "کسٹمر کا نام درکار ہے",
+        senderNameRequired: "بھیجنے والے کا نام درکار ہے",
+        senderAmountRequired: "رقم درکار ہے",
+        amountPositive: "رقم صفر سے زیادہ ہونی چاہیے",
+        receiverNameRequired: "وصول کنندہ کا نام درکار ہے",
+        exchangeRateRequired: "تبادلے کی شرح درکار ہے",
+        ratePositive: "شرح صفر سے زیادہ ہونی چاہیے"
       }
     },
     ps: {
-      backToCustomerRegistration: "بیرته د پیرودونکي ثبتولو ته",
-      newCustomerRecord: "نوی پیرودونکي ریکارډ",
-      createSubtitle: "د اسعارو د تبادلې نوی راکړه ورکړه ریکارډ جوړ کړئ",
-      transactionSaved: "راکړه ورکړه په بریالیتوب سره خوندي شوه!",
-      redirecting: "د پیرودونکي ثبتولو ته لیږدول کیږي...",
-      errorSaving: "د راکړې ورکړې خوندي کولو کې تېروتنه",
-      customerInfo: "د پیرودونکي معلومات",
-      address: "پته",
-      transaction: "راکړه ورکړه",
-      customerInformation: "د پیرودونکي معلومات",
+      back: "بیرته",
+      title: "نوی راکړه ورکړه",
+      subtitle: "د اسعارو د تبادلې ریکارډ اضافه کړئ",
+      saved: "راکړه ورکړه خوندي شوه!",
+      redirecting: "لیږدول کیږي...",
+      error: "د خوندي کولو تېروتنه",
       customerName: "د پیرودونکي نوم",
-      enterFullName: "د پیرودونکي بشپړ نوم دننه کړئ",
-      senderDetails: "د لیږونکي توضیحات",
-      receiverDetails: "د ترلاسه کوونکي توضیحات",
-      email: "بریښنالیک",
-      phone: "تلیفون",
-      emailPlaceholder: "email@example.com",
-      phonePlaceholder: "+92 300 1234567",
-      addressInformation: "د پتې معلومات",
-      senderAddress: "د لیږونکي پته",
-      receiverAddress: "د ترلاسه کوونکي پته",
-      country: "هیواد",
-      selectCountry: "هیواد وټاکئ",
-      stateProvince: "ایالت/ولایت",
-      selectState: "ایالت وټاکئ",
-      city: "ښار",
-      selectCity: "ښار وټاکئ",
-      addressLine: "پته",
-      addressPlaceholder: "د کوڅې پته، ودانۍ، او داسې نور",
-      transactionDetails: "د راکړې ورکړې توضیحات",
-      currencyExchange: "د اسعارو تبادله",
-      senderCurrency: "د لیږونکي اسعار",
-      receiverCurrency: "د ترلاسه کوونکي اسعار",
-      senderAmount: "د لیږونکي اندازه",
+      enterName: "د پیرودونکي نوم دننه کړئ",
+      sender: "لیږونکی (له بهر څخه)",
+      senderName: "د لیږونکي نوم",
+      enterSenderName: "د لیږونکي نوم دننه کړئ",
+      amount: "اندازه",
+      enterAmount: "0.00",
+      currency: "اسعار",
+      receiver: "ترلاسه کوونکی (په پاکستان کې)",
+      receiverName: "د ترلاسه کوونکي نوم",
+      enterReceiverName: "د ترلاسه کوونکي نوم دننه کړئ",
       exchangeRate: "د تبادلې نرخ",
-      calculatedBreakdown: "حساب شوې اندازه ویش",
-      baseAmount: "بنسټیزه اندازه:",
-      totalFees: "ټولې فیسونه (کمیشن + فیس + مالیه):",
-      finalAmount: "د ترلاسه کولو لپاره وروستۍ اندازه:",
-      feesCharges: "فیسونه او چارجونه",
-      commission: "کمیشن",
-      exchangeFee: "د تبادلې فیس",
-      tax: "مالیه",
-      status: "حالت",
-      notes: "یادښتونه (اختیاري)",
-      notesPlaceholder: "اضافي یادښتونه",
-      nextStep: "بل ګام",
-      previous: "مخکینی",
-      saveRecord: "ریکارډ خوندي کړئ",
+      rateHint: "1 USD = ? PKR",
+      description: "تشریح (اختیاري)",
+      enterDescription: "یادښتونه اضافه کړئ",
+      save: "خوندي",
       saving: "خوندي کیږي...",
       required: "*",
-      errors: {
-        customerNameRequired: "د پیرودونکي نوم اړین دی",
-        senderEmailRequired: "د لیږونکي بریښنالیک اړین دی",
-        invalidEmail: "غلط بریښنالیک بڼه",
-        senderPhoneRequired: "د لیږونکي تلیفون اړین دی",
-        receiverEmailRequired: "د ترلاسه کوونکي بریښنالیک اړین دی",
-        receiverPhoneRequired: "د ترلاسه کوونکي تلیفون اړین دی",
-        senderCountryRequired: "د لیږونکي هیواد اړین دی",
-        senderAddressRequired: "د لیږونکي پته اړینه ده",
-        receiverCountryRequired: "د ترلاسه کوونکي هیواد اړین دی",
-        receiverAddressRequired: "د ترلاسه کوونکي پته اړینه ده",
-        senderCurrencyRequired: "د لیږونکي اسعار اړین دی",
-        receiverCurrencyRequired: "د ترلاسه کوونکي اسعار اړین دی",
-        senderAmountRequired: "د لیږونکي اندازه اړینه ده",
-        amountGreaterThanZero: "اندازه باید له صفر څخه زیاته وي",
-        exchangeRateRequired: "د تبادلې نرخ اړین دی",
-        exchangeRateGreaterThanZero: "د تبادلې نرخ باید له صفر څخه زیاته وي"
+      receiverGets: "ترلاسه کوونکی ترلاسه کوي:",
+      calculator: {
+        title: "حسابګر",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
       },
-      statusOptions: {
-        pending: "په انتظار کې",
-        processing: "پروسه روانه ده",
-        completed: "بشپړ شوی",
-        cancelled: "لغوه شوی"
+      errors: {
+        nameRequired: "د پیرودونکي نوم اړین دی",
+        senderNameRequired: "د لیږونکي نوم اړین دی",
+        senderAmountRequired: "اندازه اړینه ده",
+        amountPositive: "اندازه باید له صفر څخه زیاته وي",
+        receiverNameRequired: "د ترلاسه کوونکي نوم اړین دی",
+        exchangeRateRequired: "د تبادلې نرخ اړین دی",
+        ratePositive: "نرخ باید له صفر څخه زیاته وي"
       }
     },
     fa: {
-      backToCustomerRegistration: "بازگشت به ثبت نام مشتری",
-      newCustomerRecord: "رکورد جدید مشتری",
-      createSubtitle: "ایجاد رکورد جدید تراکنش تبدیل ارز",
-      transactionSaved: "تراکنش با موفقیت ذخیره شد!",
-      redirecting: "در حال انتقال به ثبت نام مشتری...",
-      errorSaving: "خطا در ذخیره تراکنش",
-      customerInfo: "اطلاعات مشتری",
-      address: "آدرس",
-      transaction: "تراکنش",
-      customerInformation: "اطلاعات مشتری",
+      back: "بازگشت",
+      title: "تراکنش جدید",
+      subtitle: "افزودن رکورد تبدیل ارز",
+      saved: "تراکنش ذخیره شد!",
+      redirecting: "در حال انتقال...",
+      error: "خطا در ذخیره",
       customerName: "نام مشتری",
-      enterFullName: "نام کامل مشتری را وارد کنید",
-      senderDetails: "جزئیات فرستنده",
-      receiverDetails: "جزئیات گیرنده",
-      email: "ایمیل",
-      phone: "تلفن",
-      emailPlaceholder: "email@example.com",
-      phonePlaceholder: "+92 300 1234567",
-      addressInformation: "اطلاعات آدرس",
-      senderAddress: "آدرس فرستنده",
-      receiverAddress: "آدرس گیرنده",
-      country: "کشور",
-      selectCountry: "انتخاب کشور",
-      stateProvince: "استان",
-      selectState: "انتخاب استان",
-      city: "شهر",
-      selectCity: "انتخاب شهر",
-      addressLine: "آدرس",
-      addressPlaceholder: "آدرس خیابان، ساختمان و غیره",
-      transactionDetails: "جزئیات تراکنش",
-      currencyExchange: "تبدیل ارز",
-      senderCurrency: "ارز فرستنده",
-      receiverCurrency: "ارز گیرنده",
-      senderAmount: "مبلغ ارسالی",
+      enterName: "نام مشتری را وارد کنید",
+      sender: "فرستنده (از خارج از کشور)",
+      senderName: "نام فرستنده",
+      enterSenderName: "نام فرستنده را وارد کنید",
+      amount: "مبلغ",
+      enterAmount: "0.00",
+      currency: "ارز",
+      receiver: "گیرنده (در پاکستان)",
+      receiverName: "نام گیرنده",
+      enterReceiverName: "نام گیرنده را وارد کنید",
       exchangeRate: "نرخ تبدیل",
-      calculatedBreakdown: "تجزیه مبلغ محاسبه شده",
-      baseAmount: "مبلغ پایه:",
-      totalFees: "کل کارمزدها (کمیسیون + کارمزد + مالیات):",
-      finalAmount: "مبلغ نهایی برای دریافت:",
-      feesCharges: "کارمزدها و هزینه‌ها",
-      commission: "کمیسیون",
-      exchangeFee: "کارمزد تبدیل",
-      tax: "مالیات",
-      status: "وضعیت",
-      notes: "یادداشت‌ها (اختیاری)",
-      notesPlaceholder: "یادداشت‌های اضافی",
-      nextStep: "مرحله بعد",
-      previous: "قبلی",
-      saveRecord: "ذخیره رکورد",
+      rateHint: "1 USD = ? PKR",
+      description: "توضیحات (اختیاری)",
+      enterDescription: "افزودن یادداشت",
+      save: "ذخیره",
       saving: "در حال ذخیره...",
       required: "*",
-      errors: {
-        customerNameRequired: "نام مشتری الزامی است",
-        senderEmailRequired: "ایمیل فرستنده الزامی است",
-        invalidEmail: "فرمت ایمیل نامعتبر است",
-        senderPhoneRequired: "تلفن فرستنده الزامی است",
-        receiverEmailRequired: "ایمیل گیرنده الزامی است",
-        receiverPhoneRequired: "تلفن گیرنده الزامی است",
-        senderCountryRequired: "کشور فرستنده الزامی است",
-        senderAddressRequired: "آدرس فرستنده الزامی است",
-        receiverCountryRequired: "کشور گیرنده الزامی است",
-        receiverAddressRequired: "آدرس گیرنده الزامی است",
-        senderCurrencyRequired: "ارز فرستنده الزامی است",
-        receiverCurrencyRequired: "ارز گیرنده الزامی است",
-        senderAmountRequired: "مبلغ ارسالی الزامی است",
-        amountGreaterThanZero: "مبلغ باید بیشتر از صفر باشد",
-        exchangeRateRequired: "نرخ تبدیل الزامی است",
-        exchangeRateGreaterThanZero: "نرخ تبدیل باید بیشتر از صفر باشد"
+      receiverGets: "گیرنده دریافت می‌کند:",
+      calculator: {
+        title: "ماشین حساب",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
       },
-      statusOptions: {
-        pending: "در انتظار",
-        processing: "در حال پردازش",
-        completed: "تکمیل شده",
-        cancelled: "لغو شده"
+      errors: {
+        nameRequired: "نام مشتری الزامی است",
+        senderNameRequired: "نام فرستنده الزامی است",
+        senderAmountRequired: "مبلغ الزامی است",
+        amountPositive: "مبلغ باید بیشتر از صفر باشد",
+        receiverNameRequired: "نام گیرنده الزامی است",
+        exchangeRateRequired: "نرخ تبدیل الزامی است",
+        ratePositive: "نرخ باید بیشتر از صفر باشد"
       }
     }
   };
 
   // Get language from localStorage
-  const [currentLang, setCurrentLang] = useState('en');
-  const [isInitialized, setIsInitialized] = useState(false);
-
   useEffect(() => {
     const savedLang = localStorage.getItem('appLanguage');
     if (savedLang && ['en', 'ur', 'ps', 'fa'].includes(savedLang)) {
@@ -416,36 +255,23 @@ const CustomerRecordCreate = () => {
   const t = translations[currentLang] || translations.en;
   const isRTL = currentLang === 'ur' || currentLang === 'ps' || currentLang === 'fa';
 
-  // Currencies list with symbols
-  const currencies = [
-    { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸' },
-    { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺' },
-    { code: 'GBP', name: 'British Pound', symbol: '£', flag: '🇬🇧' },
-    { code: 'PKR', name: 'Pakistani Rupee', symbol: '₨', flag: '🇵🇰' },
-    { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪' },
-    { code: 'SAR', name: 'Saudi Riyal', symbol: 'ر.س', flag: '🇸🇦' },
-    { code: 'AFN', name: 'Afghan Afghani', symbol: '؋', flag: '🇦🇫' },
-    { code: 'INR', name: 'Indian Rupee', symbol: '₹', flag: '🇮🇳' },
-    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', flag: '🇨🇦' },
-    { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', flag: '🇦🇺' }
-  ];
-
   // Get currency symbol
   const getCurrencySymbol = (code) => {
     const currency = currencies.find(c => c.code === code);
     return currency ? currency.symbol : '$';
   };
 
-  // Format amount with currency symbol
-  const formatAmount = (amount, currencyCode) => {
-    if (!amount && amount !== 0) return 'N/A';
-    const symbol = getCurrencySymbol(currencyCode);
-    const formattedAmount = amount.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-    return `${symbol} ${formattedAmount}`;
-  };
+  // Calculate receiver amount
+  useEffect(() => {
+    if (formData.senderAmount && formData.exchangeRate) {
+      const amount = parseFloat(formData.senderAmount) || 0;
+      const rate = parseFloat(formData.exchangeRate) || 0;
+      const receiverAmount = amount * rate;
+      setCalculatedReceiverAmount(receiverAmount);
+    } else {
+      setCalculatedReceiverAmount(null);
+    }
+  }, [formData.senderAmount, formData.exchangeRate]);
 
   // Handle API errors
   useEffect(() => {
@@ -459,243 +285,179 @@ const CustomerRecordCreate = () => {
   useEffect(() => {
     if (success) {
       setSaveSuccess(true);
-      toast.success(t.transactionSaved);
-      
-      // Reset the transaction state
+      toast.success(t.saved);
       dispatch({ type: CREATE_TRANSACTION_RESET });
-      
-      // Redirect after 2 seconds
       setTimeout(() => {
         navigate('/customer-registration');
       }, 2000);
     }
   }, [success, dispatch, navigate, t]);
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      dispatch({ type: CREATE_TRANSACTION_RESET });
-    };
-  }, [dispatch]);
-
-  // Load sender states when country changes
-  useEffect(() => {
-    if (formData.senderCountry) {
-      const states = State.getStatesOfCountry(formData.senderCountry);
-      setSenderStates(states);
-      setFormData(prev => ({ ...prev, senderState: '', senderCity: '' }));
-    }
-  }, [formData.senderCountry]);
-
-  // Load receiver states when country changes
-  useEffect(() => {
-    if (formData.receiverCountry) {
-      const states = State.getStatesOfCountry(formData.receiverCountry);
-      setReceiverStates(states);
-      setFormData(prev => ({ ...prev, receiverState: '', receiverCity: '' }));
-    }
-  }, [formData.receiverCountry]);
-
-  // Load sender cities when state changes
-  useEffect(() => {
-    if (formData.senderCountry && formData.senderState) {
-      const cities = City.getCitiesOfState(formData.senderCountry, formData.senderState);
-      setSenderCities(cities);
-    }
-  }, [formData.senderCountry, formData.senderState]);
-
-  // Load receiver cities when state changes
-  useEffect(() => {
-    if (formData.receiverCountry && formData.receiverState) {
-      const cities = City.getCitiesOfState(formData.receiverCountry, formData.receiverState);
-      setReceiverCities(cities);
-    }
-  }, [formData.receiverCountry, formData.receiverState]);
-
-  // Calculate receiver amount when sender amount, rate, and fees change
-  useEffect(() => {
-    if (formData.senderAmount && formData.exchangeRate) {
-      const sender = parseFloat(formData.senderAmount) || 0;
-      const rate = parseFloat(formData.exchangeRate) || 0;
-      const commission = parseFloat(formData.commission) || 0;
-      const fee = parseFloat(formData.fee) || 0;
-      const tax = parseFloat(formData.tax) || 0;
-      
-      const baseAmount = sender * rate;
-      const totalFees = commission + fee + tax;
-      const finalAmount = baseAmount - totalFees;
-      
-      setCalculatedAmount({
-        base: baseAmount,
-        fees: totalFees,
-        final: finalAmount,
-        senderCurrency: formData.senderCurrency,
-        receiverCurrency: formData.receiverCurrency
-      });
-    }
-  }, [formData.senderAmount, formData.exchangeRate, formData.commission, formData.fee, formData.tax, formData.senderCurrency, formData.receiverCurrency]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+  // Update form field
+  const updateField = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
-  const validateStep = (step) => {
-    const newErrors = {};
-    
-    if (step === 1) {
-      if (!formData.name) newErrors.name = t.errors.customerNameRequired;
-      if (!formData.senderEmail) newErrors.senderEmail = t.errors.senderEmailRequired;
-      else if (!/\S+@\S+\.\S+/.test(formData.senderEmail)) newErrors.senderEmail = t.errors.invalidEmail;
-      if (!formData.senderPhone) newErrors.senderPhone = t.errors.senderPhoneRequired;
-      if (!formData.receiverEmail) newErrors.receiverEmail = t.errors.receiverEmailRequired;
-      if (!formData.receiverPhone) newErrors.receiverPhone = t.errors.receiverPhoneRequired;
+  // Calculator functions
+  const evaluateExpression = (expr) => {
+    try {
+      let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
+      const result = Function('return (' + expression + ')')();
+      return result;
+    } catch (e) {
+      return null;
     }
-    
-    if (step === 2) {
-      if (!formData.senderCountry) newErrors.senderCountry = t.errors.senderCountryRequired;
-      if (!formData.senderAddress) newErrors.senderAddress = t.errors.senderAddressRequired;
-      if (!formData.receiverCountry) newErrors.receiverCountry = t.errors.receiverCountryRequired;
-      if (!formData.receiverAddress) newErrors.receiverAddress = t.errors.receiverAddressRequired;
-    }
-    
-    if (step === 3) {
-      if (!formData.senderCurrency) newErrors.senderCurrency = t.errors.senderCurrencyRequired;
-      if (!formData.receiverCurrency) newErrors.receiverCurrency = t.errors.receiverCurrencyRequired;
-      if (!formData.senderAmount) newErrors.senderAmount = t.errors.senderAmountRequired;
-      else if (parseFloat(formData.senderAmount) <= 0) newErrors.senderAmount = t.errors.amountGreaterThanZero;
-      if (!formData.exchangeRate) newErrors.exchangeRate = t.errors.exchangeRateRequired;
-      else if (parseFloat(formData.exchangeRate) <= 0) newErrors.exchangeRate = t.errors.exchangeRateGreaterThanZero;
-    }
-    
-    return newErrors;
   };
 
-  const handleNext = () => {
-    const stepErrors = validateStep(currentStep);
-    if (Object.keys(stepErrors).length === 0) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleCalculatorButton = (value) => {
+    if (value === 'C') {
+      setCalculatorInput('');
+      setCalculatorExpression('');
+    } else if (value === '⌫') {
+      setCalculatorInput(prev => prev.slice(0, -1));
+      setCalculatorExpression(prev => prev.slice(0, -1));
+    } else if (value === '=') {
+      const result = evaluateExpression(calculatorExpression || calculatorInput);
+      if (result !== null && !isNaN(result)) {
+        const rounded = Math.round(result * 100) / 100;
+        setCalculatorInput(rounded.toString());
+        setCalculatorExpression(rounded.toString());
+        if (activeField) {
+          updateField(activeField, rounded.toString());
+        }
+        setShowCalculator(false);
+        setActiveField(null);
+      }
     } else {
-      setErrors(stepErrors);
+      setCalculatorInput(prev => prev + value);
+      setCalculatorExpression(prev => prev + value);
     }
   };
 
-  const handlePrevious = () => {
-    setCurrentStep(currentStep - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const openCalculator = (field, currentValue) => {
+    setActiveField(field);
+    setCalculatorInput(currentValue || '');
+    setCalculatorExpression(currentValue || '');
+    setShowCalculator(true);
   };
 
+  // Validate form
+  const validateForm = () => {
+    const newErrors = {};
+    let hasError = false;
+
+    if (!formData.name.trim()) {
+      newErrors.name = t.errors.nameRequired;
+      hasError = true;
+    }
+    
+    if (!formData.senderName.trim()) {
+      newErrors.senderName = t.errors.senderNameRequired;
+      hasError = true;
+    }
+    
+    if (!formData.senderAmount) {
+      newErrors.senderAmount = t.errors.senderAmountRequired;
+      hasError = true;
+    } else if (parseFloat(formData.senderAmount) <= 0) {
+      newErrors.senderAmount = t.errors.amountPositive;
+      hasError = true;
+    }
+    
+    if (!formData.receiverName.trim()) {
+      newErrors.receiverName = t.errors.receiverNameRequired;
+      hasError = true;
+    }
+    
+    if (!formData.exchangeRate) {
+      newErrors.exchangeRate = t.errors.exchangeRateRequired;
+      hasError = true;
+    } else if (parseFloat(formData.exchangeRate) <= 0) {
+      newErrors.exchangeRate = t.errors.ratePositive;
+      hasError = true;
+    }
+
+    setErrors(newErrors);
+    return !hasError;
+  };
+
+  // Handle form submit - status always "completed"
   const handleSubmit = (e) => {
     e.preventDefault();
-    const stepErrors = validateStep(3);
     
-    if (Object.keys(stepErrors).length === 0) {
-      // Prepare data for API
+    if (validateForm()) {
+      const amount = parseFloat(formData.senderAmount);
+      const rate = parseFloat(formData.exchangeRate);
+      const receiverAmount = amount * rate;
+      
       const transactionData = {
         name: formData.name,
-        senderEmail: formData.senderEmail,
-        senderPhone: formData.senderPhone,
+        senderName: formData.senderName,
+        senderAmount: amount,
         senderCurrency: formData.senderCurrency,
-        senderAmount: parseFloat(formData.senderAmount),
-        senderCountry: formData.senderCountry,
-        senderState: formData.senderState || '',
-        senderCity: formData.senderCity || '',
-        senderAddress: formData.senderAddress,
-        receiverEmail: formData.receiverEmail,
-        receiverPhone: formData.receiverPhone,
+        receiverName: formData.receiverName,
+        receiverAmount: receiverAmount,
         receiverCurrency: formData.receiverCurrency,
-        receiverCountry: formData.receiverCountry,
-        receiverState: formData.receiverState || '',
-        receiverCity: formData.receiverCity || '',
-        receiverAddress: formData.receiverAddress,
-        commission: parseFloat(formData.commission) || 0,
-        fee: parseFloat(formData.fee) || 0,
-        tax: parseFloat(formData.tax) || 0,
-        exchangeRate: parseFloat(formData.exchangeRate),
-        status: formData.status,
-        notes: formData.notes || ''
+        exchangeRate: rate,
+        description: formData.description || '',
+        status: 'completed'  // Always completed
       };
       
-      // Dispatch create action
       dispatch(createTransactionAction(transactionData));
-    } else {
-      setErrors(stepErrors);
     }
   };
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
+  const CalculatorButton = ({ children, onClick, variant = 'number' }) => {
+    const getBgColor = () => {
+      if (variant === 'operator') return 'bg-green-100 text-green-600 active:bg-green-200';
+      if (variant === 'clear') return 'bg-gray-200 text-gray-700 active:bg-gray-300';
+      return 'bg-gray-100 text-gray-700 active:bg-gray-200';
+    };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 10
-      }
-    }
+    return (
+      <button
+        onClick={onClick}
+        className={`p-4 text-xl font-medium rounded-xl transition-colors ${getBgColor()}`}
+      >
+        {children}
+      </button>
+    );
   };
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
       </div>
     );
   }
 
   return (
-    <motion.div 
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8"
-      dir={isRTL ? 'rtl' : 'ltr'}
-    >
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            to="/customer-registration"
-            className="inline-flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors mb-4"
-            style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
-          >
-            <ArrowLeft size={18} />
-            <span>{t.backToCustomerRegistration}</span>
+    <div className="min-h-screen bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <Link to="/customer-registration" className="p-2 -ml-2 active:bg-gray-100 rounded-full">
+            <ArrowLeft size={24} className="text-gray-600" />
           </Link>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-            {t.newCustomerRecord}
-          </h1>
-          <p className="text-gray-600 mt-1">{t.createSubtitle}</p>
+          <div className="text-center flex-1">
+            <h1 className="text-lg font-bold text-gray-800">{t.title}</h1>
+            <p className="text-xs text-gray-500">{t.subtitle}</p>
+          </div>
+          <div className="w-10" />
         </div>
+      </div>
 
+      <main className="p-4 pb-32">
         {/* Success Message */}
         {saveSuccess && (
-          <div className="mb-6 p-4 bg-green-100 border border-green-300 rounded-xl flex items-center space-x-3 animate-fadeIn" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <CheckCircle className="w-5 h-5 text-green-600" />
+          <div className="mb-4 p-4 bg-green-100 border border-green-300 rounded-2xl flex items-center gap-3 animate-fadeIn">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
             <div>
-              <p className="text-green-700 font-medium">{t.transactionSaved}</p>
+              <p className="text-green-700 font-medium">{t.saved}</p>
               <p className="text-sm text-green-600">{t.redirecting}</p>
             </div>
           </div>
@@ -703,688 +465,333 @@ const CustomerRecordCreate = () => {
 
         {/* Error Message */}
         {error && !saveSuccess && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-300 rounded-xl flex items-center space-x-3" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <div>
-              <p className="text-red-700 font-medium">{t.errorSaving}</p>
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
+          <div className="mb-4 p-4 bg-red-100 border border-red-300 rounded-2xl flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <p className="text-red-700 font-medium">{t.error}</p>
           </div>
         )}
 
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center space-x-4" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            {[1, 2, 3].map((step) => (
-              <div key={step} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                  currentStep >= step 
-                    ? 'bg-gradient-to-r from-green-500 to-red-500 text-white' 
-                    : 'bg-gray-200 text-gray-500'
-                }`}>
-                  {currentStep > step ? <CheckCircle size={16} /> : step}
-                </div>
-                {step < 3 && (
-                  <div className={`w-16 h-1 mx-2 ${
-                    currentStep > step ? 'bg-gradient-to-r from-green-500 to-red-500' : 'bg-gray-200'
-                  }`} />
-                )}
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-green-100 overflow-hidden">
+          <div className="p-4 space-y-4">
+            {/* Customer Name - Required */}
+            <div>
+              <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                {t.customerName} <span className="text-red-500 text-xs">{t.required}</span>
+              </label>
+              <div className="relative">
+                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => updateField('name', e.target.value)}
+                  className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                    errors.name
+                      ? 'border-red-500 focus:ring-red-500/20'
+                      : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'
+                  }`}
+                  placeholder={t.enterName}
+                />
               </div>
-            ))}
-          </div>
-          <div className="flex justify-center space-x-12 mt-2 text-xs" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <span className="text-gray-600">{t.customerInfo}</span>
-            <span className="text-gray-600">{t.address}</span>
-            <span className="text-gray-600">{t.transaction}</span>
-          </div>
-        </div>
+              {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+            </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-3xl shadow-2xl p-6 lg:p-8 border border-gray-200">
-          <form onSubmit={handleSubmit}>
-            {/* Step 1: Customer Information */}
-            {currentStep === 1 && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="space-y-6"
-              >
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <User className="w-5 h-5 text-green-600 mr-2" />
-                  {t.customerInformation}
-                </h2>
+            {/* Sender Section */}
+            <div className="bg-blue-50 rounded-xl p-3">
+              <p className="text-sm font-medium text-blue-700 mb-3 flex items-center gap-2">
+                <TrendingUp size={16} />
+                {t.sender}
+              </p>
+              
+              {/* Sender Name */}
+              <div className="mb-3">
+                <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                  {t.senderName} <span className="text-red-500 text-xs">{t.required}</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.senderName}
+                  onChange={(e) => updateField('senderName', e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                    errors.senderName
+                      ? 'border-red-500 focus:ring-red-500/20'
+                      : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'
+                  }`}
+                  placeholder={t.enterSenderName}
+                />
+                {errors.senderName && <p className="mt-1 text-xs text-red-500">{errors.senderName}</p>}
+              </div>
 
-                {/* Customer Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t.customerName} <span className="text-red-500">{t.required}</span>
+              {/* Amount and Currency */}
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                    {t.amount} <span className="text-red-500 text-xs">{t.required}</span>
                   </label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        type="number"
+                        value={formData.senderAmount}
+                        onChange={(e) => updateField('senderAmount', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                          errors.senderAmount
+                            ? 'border-red-500 focus:ring-red-500/20'
+                            : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'
+                        }`}
+                        placeholder={t.enterAmount}
+                        step="0.01"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                        {getCurrencySymbol(formData.senderCurrency)}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => openCalculator('senderAmount', formData.senderAmount)}
+                      className="px-4 py-3 bg-green-100 text-green-600 rounded-xl active:bg-green-200 transition-colors"
+                    >
+                      <Calculator size={20} />
+                    </button>
+                  </div>
+                  {errors.senderAmount && <p className="mt-1 text-xs text-red-500">{errors.senderAmount}</p>}
+                </div>
+                
+                <div className="w-28">
+                  <label className="text-sm font-medium text-gray-700 mb-1.5 block">
+                    {t.currency}
+                  </label>
+                  <select
+                    value={formData.senderCurrency}
+                    onChange={(e) => updateField('senderCurrency', e.target.value)}
+                    className="w-full px-2 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 appearance-none bg-white text-sm"
+                  >
+                    {currencies.map(currency => (
+                      <option key={currency.code} value={currency.code}>
+                        {currency.code}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Exchange Rate */}
+            <div>
+              <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                {t.exchangeRate} <span className="text-red-500 text-xs">{t.required}</span>
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+                    1 {formData.senderCurrency} =
+                  </span>
                   <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border ${
-                      errors.name ? 'border-red-500' : 'border-gray-300'
-                    } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                    placeholder={t.enterFullName}
+                    type="number"
+                    value={formData.exchangeRate}
+                    onChange={(e) => updateField('exchangeRate', e.target.value)}
+                    className={`w-full pl-20 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                      errors.exchangeRate
+                        ? 'border-red-500 focus:ring-red-500/20'
+                        : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'
+                    }`}
+                    placeholder="0.00"
+                    step="0.01"
                   />
-                  {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                    {getCurrencySymbol(formData.receiverCurrency)}
+                  </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => openCalculator('exchangeRate', formData.exchangeRate)}
+                  className="px-4 py-3 bg-green-100 text-green-600 rounded-xl active:bg-green-200 transition-colors"
+                >
+                  <Calculator size={20} />
+                </button>
+              </div>
+              {errors.exchangeRate && <p className="mt-1 text-xs text-red-500">{errors.exchangeRate}</p>}
+            </div>
 
-                {/* Sender Details */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <Mail className="w-4 h-4 text-blue-600 mr-2" />
-                    {t.senderDetails}
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.email} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <input
-                        type="email"
-                        name="senderEmail"
-                        value={formData.senderEmail}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.senderEmail ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                        placeholder={t.emailPlaceholder}
-                      />
-                      {errors.senderEmail && <p className="mt-1 text-sm text-red-600">{errors.senderEmail}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.phone} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <input
-                        type="tel"
-                        name="senderPhone"
-                        value={formData.senderPhone}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.senderPhone ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                        placeholder={t.phonePlaceholder}
-                      />
-                      {errors.senderPhone && <p className="mt-1 text-sm text-red-600">{errors.senderPhone}</p>}
-                    </div>
-                  </div>
-                </div>
+            {/* Receiver Section */}
+            <div className="bg-green-50 rounded-xl p-3">
+              <p className="text-sm font-medium text-green-700 mb-3 flex items-center gap-2">
+                <TrendingDown size={16} />
+                {t.receiver}
+              </p>
+              
+              {/* Receiver Name */}
+              <div className="mb-3">
+                <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                  {t.receiverName} <span className="text-red-500 text-xs">{t.required}</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.receiverName}
+                  onChange={(e) => updateField('receiverName', e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                    errors.receiverName
+                      ? 'border-red-500 focus:ring-red-500/20'
+                      : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'
+                  }`}
+                  placeholder={t.enterReceiverName}
+                />
+                {errors.receiverName && <p className="mt-1 text-xs text-red-500">{errors.receiverName}</p>}
+              </div>
 
-                {/* Receiver Details */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <Mail className="w-4 h-4 text-red-600 mr-2" />
-                    {t.receiverDetails}
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.email} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <input
-                        type="email"
-                        name="receiverEmail"
-                        value={formData.receiverEmail}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.receiverEmail ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                        placeholder={t.emailPlaceholder}
-                      />
-                      {errors.receiverEmail && <p className="mt-1 text-sm text-red-600">{errors.receiverEmail}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.phone} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <input
-                        type="tel"
-                        name="receiverPhone"
-                        value={formData.receiverPhone}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.receiverPhone ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                        placeholder={t.phonePlaceholder}
-                      />
-                      {errors.receiverPhone && <p className="mt-1 text-sm text-red-600">{errors.receiverPhone}</p>}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation */}
-                <div className="flex justify-end mt-8">
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300"
+              {/* Receiver Currency (fixed to PKR) */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1.5 block">
+                  {t.currency}
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.receiverCurrency}
+                    onChange={(e) => updateField('receiverCurrency', e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 appearance-none bg-white"
                   >
-                    {t.nextStep}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 2: Address Information */}
-            {currentStep === 2 && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="space-y-6"
-              >
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <MapPin className="w-5 h-5 text-green-600 mr-2" />
-                  {t.addressInformation}
-                </h2>
-
-                {/* Sender Address */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <MapPin className="w-4 h-4 text-blue-600 mr-2" />
-                    {t.senderAddress}
-                  </h3>
-                  <div className="space-y-4">
-                    {/* Country */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.country} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <select
-                        name="senderCountry"
-                        value={formData.senderCountry}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.senderCountry ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                      >
-                        <option value="">{t.selectCountry}</option>
-                        {countries.map(country => (
-                          <option key={country.isoCode} value={country.isoCode}>
-                            {country.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.senderCountry && <p className="mt-1 text-sm text-red-600">{errors.senderCountry}</p>}
-                    </div>
-
-                    {/* State/Province */}
-                    {formData.senderCountry && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t.stateProvince}
-                        </label>
-                        <select
-                          name="senderState"
-                          value={formData.senderState}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                        >
-                          <option value="">{t.selectState}</option>
-                          {senderStates.map(state => (
-                            <option key={state.isoCode} value={state.isoCode}>
-                              {state.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {/* City */}
-                    {formData.senderState && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t.city}
-                        </label>
-                        <select
-                          name="senderCity"
-                          value={formData.senderCity}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                        >
-                          <option value="">{t.selectCity}</option>
-                          {senderCities.map(city => (
-                            <option key={city.name} value={city.name}>
-                              {city.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {/* Address */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.addressLine} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="senderAddress"
-                        value={formData.senderAddress}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.senderAddress ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                        placeholder={t.addressPlaceholder}
-                      />
-                      {errors.senderAddress && <p className="mt-1 text-sm text-red-600">{errors.senderAddress}</p>}
-                    </div>
+                    <option value="PKR">🇵🇰 PKR - Pakistani Rupee (₨)</option>
+                    {currencies.filter(c => c.code !== 'PKR').map(currency => (
+                      <option key={currency.code} value={currency.code}>
+                        {currency.flag} {currency.code} - {currency.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <div className="w-2 h-2 border-r border-b border-gray-400 rotate-45" />
                   </div>
                 </div>
+              </div>
 
-                {/* Receiver Address */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <MapPin className="w-4 h-4 text-red-600 mr-2" />
-                    {t.receiverAddress}
-                  </h3>
-                  <div className="space-y-4">
-                    {/* Country */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.country} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <select
-                        name="receiverCountry"
-                        value={formData.receiverCountry}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.receiverCountry ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                      >
-                        <option value="">{t.selectCountry}</option>
-                        {countries.map(country => (
-                          <option key={country.isoCode} value={country.isoCode}>
-                            {country.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.receiverCountry && <p className="mt-1 text-sm text-red-600">{errors.receiverCountry}</p>}
-                    </div>
-
-                    {/* State/Province */}
-                    {formData.receiverCountry && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t.stateProvince}
-                        </label>
-                        <select
-                          name="receiverState"
-                          value={formData.receiverState}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                        >
-                          <option value="">{t.selectState}</option>
-                          {receiverStates.map(state => (
-                            <option key={state.isoCode} value={state.isoCode}>
-                              {state.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {/* City */}
-                    {formData.receiverState && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {t.city}
-                        </label>
-                        <select
-                          name="receiverCity"
-                          value={formData.receiverCity}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                        >
-                          <option value="">{t.selectCity}</option>
-                          {receiverCities.map(city => (
-                            <option key={city.name} value={city.name}>
-                              {city.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {/* Address */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.addressLine} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="receiverAddress"
-                        value={formData.receiverAddress}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.receiverAddress ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                        placeholder={t.addressPlaceholder}
-                      />
-                      {errors.receiverAddress && <p className="mt-1 text-sm text-red-600">{errors.receiverAddress}</p>}
-                    </div>
+              {/* Calculated Amount */}
+              {calculatedReceiverAmount !== null && (
+                <div className="mt-3 p-3 bg-white rounded-xl border border-green-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-600">{t.receiverGets}</span>
+                    <span className="text-xl font-bold text-green-600">
+                      {getCurrencySymbol(formData.receiverCurrency)} {calculatedReceiverAmount.toFixed(2)}
+                    </span>
                   </div>
                 </div>
+              )}
+            </div>
 
-                {/* Navigation */}
-                <div className="flex justify-between mt-8">
-                  <button
-                    type="button"
-                    onClick={handlePrevious}
-                    className="px-8 py-3 border border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300"
-                  >
-                    {t.previous}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300"
-                  >
-                    {t.nextStep}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 3: Transaction Details */}
-            {currentStep === 3 && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="space-y-6"
-              >
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <TrendingUp className="w-5 h-5 text-green-600 mr-2" />
-                  {t.transactionDetails}
-                </h2>
-
-                {/* Currency Exchange */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <Globe className="w-4 h-4 text-green-600 mr-2" />
-                    {t.currencyExchange}
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* Sender Currency */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.senderCurrency} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <select
-                        name="senderCurrency"
-                        value={formData.senderCurrency}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.senderCurrency ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                      >
-                        {currencies.map(currency => (
-                          <option key={currency.code} value={currency.code}>
-                            {currency.flag} {currency.code} - {currency.name} ({currency.symbol})
-                          </option>
-                        ))}
-                      </select>
-                      {errors.senderCurrency && <p className="mt-1 text-sm text-red-600">{errors.senderCurrency}</p>}
-                    </div>
-
-                    {/* Receiver Currency */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.receiverCurrency} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <select
-                        name="receiverCurrency"
-                        value={formData.receiverCurrency}
-                        onChange={handleChange}
-                        className={`w-full px-4 py-3 border ${
-                          errors.receiverCurrency ? 'border-red-500' : 'border-gray-300'
-                        } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                      >
-                        {currencies.map(currency => (
-                          <option key={currency.code} value={currency.code}>
-                            {currency.flag} {currency.code} - {currency.name} ({currency.symbol})
-                          </option>
-                        ))}
-                      </select>
-                      {errors.receiverCurrency && <p className="mt-1 text-sm text-red-600">{errors.receiverCurrency}</p>}
-                    </div>
-                  </div>
-
-                  {/* Amount and Rate */}
-                  <div className="grid md:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.senderAmount} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(formData.senderCurrency)}
-                        </span>
-                        <input
-                          type="number"
-                          name="senderAmount"
-                          value={formData.senderAmount}
-                          onChange={handleChange}
-                          className={`w-full pl-10 pr-4 py-3 border ${
-                            errors.senderAmount ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                          placeholder="0.00"
-                          step="0.01"
-                        />
-                      </div>
-                      {errors.senderAmount && <p className="mt-1 text-sm text-red-600">{errors.senderAmount}</p>}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.exchangeRate} <span className="text-red-500">{t.required}</span>
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">
-                          1 {formData.senderCurrency} =
-                        </span>
-                        <input
-                          type="number"
-                          name="exchangeRate"
-                          value={formData.exchangeRate}
-                          onChange={handleChange}
-                          className={`w-full pl-24 pr-4 py-3 border ${
-                            errors.exchangeRate ? 'border-red-500' : 'border-gray-300'
-                          } rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300`}
-                          placeholder="0.00"
-                          step="0.01"
-                        />
-                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(formData.receiverCurrency)}
-                        </span>
-                      </div>
-                      {errors.exchangeRate && <p className="mt-1 text-sm text-red-600">{errors.exchangeRate}</p>}
-                    </div>
-                  </div>
-
-                  {/* Calculated Amount */}
-                  {calculatedAmount && (
-                    <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
-                      <h4 className="text-sm font-medium text-green-800 mb-3">{t.calculatedBreakdown}</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                          <span className="text-gray-600">{t.baseAmount}</span>
-                          <span className="font-medium text-gray-800">
-                            {formatAmount(calculatedAmount.base, calculatedAmount.receiverCurrency)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center text-red-600" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                          <span>{t.totalFees}</span>
-                          <span className="font-medium">
-                            - {formatAmount(calculatedAmount.fees, calculatedAmount.receiverCurrency)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t border-green-200" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                          <span className="font-bold text-gray-800">{t.finalAmount}</span>
-                          <span className="font-bold text-green-600 text-lg">
-                            {formatAmount(calculatedAmount.final, calculatedAmount.receiverCurrency)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Fees & Charges */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <Receipt className="w-4 h-4 text-green-600 mr-2" />
-                    {t.feesCharges}
-                  </h3>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.commission}
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(formData.receiverCurrency)}
-                        </span>
-                        <input
-                          type="number"
-                          name="commission"
-                          value={formData.commission}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                          placeholder="0.00"
-                          step="0.01"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.exchangeFee}
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(formData.receiverCurrency)}
-                        </span>
-                        <input
-                          type="number"
-                          name="fee"
-                          value={formData.fee}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                          placeholder="0.00"
-                          step="0.01"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.tax}
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(formData.receiverCurrency)}
-                        </span>
-                        <input
-                          type="number"
-                          name="tax"
-                          value={formData.tax}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                          placeholder="0.00"
-                          step="0.01"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Status and Notes */}
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.status}
-                      </label>
-                      <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                      >
-                        <option value="pending">{t.statusOptions.pending}</option>
-                        <option value="processing">{t.statusOptions.processing}</option>
-                        <option value="completed">{t.statusOptions.completed}</option>
-                        <option value="cancelled">{t.statusOptions.cancelled}</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t.notes}
-                      </label>
-                      <input
-                        type="text"
-                        name="notes"
-                        value={formData.notes}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
-                        placeholder={t.notesPlaceholder}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation and Submit */}
-                <div className="flex justify-between mt-8">
-                  <button
-                    type="button"
-                    onClick={handlePrevious}
-                    className="px-8 py-3 border border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300"
-                  >
-                    {t.previous}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                    style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
-                  >
-                    {loading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>{t.saving}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save size={18} />
-                        <span>{t.saveRecord}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </form>
+            {/* Description - Optional */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1.5 block">
+                {t.description} ({t.optional})
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => updateField('description', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 resize-none"
+                placeholder={t.enterDescription}
+                rows={2}
+              />
+            </div>
+          </div>
         </div>
+
+        <div className="h-4" />
+      </main>
+
+      {/* Fixed Save Button */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-lg z-20">
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+          {loading ? (
+            <>
+              <RefreshCw size={18} className="animate-spin" />
+              <span>{t.saving}</span>
+            </>
+          ) : (
+            <>
+              <Save size={18} />
+              <span>{t.save}</span>
+            </>
+          )}
+        </button>
       </div>
 
-      <style jsx>{`
+      {/* Calculator Modal */}
+      {showCalculator && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center animate-fadeIn">
+          <div className="bg-white rounded-t-3xl w-full max-w-md animate-slideUp">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-800">{t.calculator.title}</h3>
+              <button onClick={() => setShowCalculator(false)} className="p-2 active:bg-gray-100 rounded-full">
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-gray-50">
+              <div className="bg-white rounded-xl p-4 shadow-inner">
+                <p className="text-right text-gray-400 text-sm min-h-[20px]">{calculatorExpression}</p>
+                <p className="text-right text-3xl font-bold text-gray-800 mt-1">{calculatorInput || '0'}</p>
+              </div>
+            </div>
+
+            <div className="p-4">
+              <div className="grid grid-cols-4 gap-2">
+                <CalculatorButton onClick={() => handleCalculatorButton('7')}>7</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('8')}>8</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('9')}>9</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('÷')} variant="operator">÷</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('4')}>4</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('5')}>5</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('6')}>6</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('×')} variant="operator">×</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('1')}>1</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('2')}>2</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('3')}>3</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('-')} variant="operator">-</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('0')}>0</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('.')}>.</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('C')} variant="clear">C</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('+')} variant="operator">+</CalculatorButton>
+
+                <button
+                  onClick={() => handleCalculatorButton('⌫')}
+                  className="p-4 text-xl font-medium text-gray-700 bg-gray-100 rounded-xl active:bg-gray-200 transition-colors col-span-2 flex items-center justify-center gap-2"
+                >
+                  <X size={18} />
+                  <span>{t.calculator.backspace}</span>
+                </button>
+                <button
+                  onClick={() => handleCalculatorButton('=')}
+                  className="p-4 text-xl font-bold rounded-xl transition-colors col-span-2 bg-gradient-to-r from-green-500 to-green-600 text-white active:from-green-600 active:to-green-700"
+                >
+                  {t.calculator.calculate}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.2s ease-out;
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
         }
       `}</style>
-    </motion.div>
+    </div>
   );
 };
 

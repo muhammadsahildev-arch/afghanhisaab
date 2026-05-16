@@ -4,12 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loadUserAction, clearErrors } from './actions/authActions';
 import Header from './Components/Layout/Header/Header';
 import Footer from './Components/Layout/Footer/Footer';
-import ContactUs from './Components/Layout/Contact/ContactUs';
-import AboutUs from './Components/Layout/About/AboutUs';
-import Home from './Components/Home/Home';
-import PrivacyPolicy from './Components/Layout/Privacy/PrivacyPolicy';
-import TermsOfService from './Components/Layout/TermsOfService/TermsOfService';
-import PageNotFound from './Components/Layout/PageNotFound/PageNotFound';
 import Login from './Components/Auth/Login';
 import ForgotPassword from './Components/Auth/ForgotPassword';
 import SignUp from './Components/Auth/SignUp';
@@ -22,23 +16,17 @@ import AdminLogin from './Components/Admin/AdminLogin';
 import AdminDashboard from './Components/Admin/AdminDashboard';
 import AdminUsers from './Components/Admin/AdminUsers';
 import UpdatePassword from './Components/Auth/UpdatePassword';
-import ViewProfile from './Components/Dashboard/ViewProfile';
 import DailyReportForm from './Components/Dashboard/DailyReport/DailyReportForm';
 import DailyRecordsUpdate from './Components/Dashboard/DailyReport/DailyRecordsUpdate';
 import DailyRecords from './Components/Dashboard/DailyReport/DailyRecords';
 import LedgerForm from './Components/Dashboard/ledger/LedgerForm';
 import Ledger from './Components/Dashboard/ledger/Ledger';
 import LedgerUpdate from './Components/Dashboard/ledger/LedgerUpdate';
-import POS from './Components/Pos/POS';
-import Inventory from './Components/Inventory/Inventory';
-import Purchases from './Components/Purchases/Purchases';
-import Warehouses from './Components/Warehouses/Warehouses';
-import Reports from './Components/Reports/Reports';
-import UserManagement from './Components/Users/UserManagement';
 import PaymentApproval from './Components/Admin/PaymentApproval';
 import AdminUpdatePassword from './Components/Admin/AdminUpdatePassword';
 import Payment from './Components/Dashboard/Payment';
 import PWAPrompt from './Components/PWA/PWAPrompt';
+import ScrollToTop from './ScrollToTop';
 
 // Helper function to check if user has required permission
 const hasPermission = (user, requiredPermission) => {
@@ -180,19 +168,12 @@ export default function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <Header />
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/contact-us" element={<ContactUs />} />
-        <Route path="/about-us" element={<AboutUs />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/*" element={<PageNotFound />} />
-
         {/* Auth Routes - Redirect if already logged in */}
         <Route 
-          path="/login" 
+          path="/" 
           element={
             <PublicRoute>
               <Login />
@@ -263,14 +244,7 @@ export default function App() {
         />
         
         {/* Profile Routes - Accessible by all authenticated users except customers */}
-        <Route 
-          path="/me" 
-          element={
-            <ProtectedRoute>
-              <ViewProfile />
-            </ProtectedRoute>
-          } 
-        />
+      
         <Route 
           path="/update-password" 
           element={
@@ -280,16 +254,7 @@ export default function App() {
           } 
         />
         
-        {/* User Management - Requires 'users' permission */}
-        <Route 
-          path="/users" 
-          element={
-            <ProtectedRoute requiredPermission="users">
-              <UserManagement />
-            </ProtectedRoute>
-          } 
-        />
-        
+    
         {/* Customer Management Routes - Requires 'customers' permission */}
         <Route 
           path="/customer-registration" 
@@ -368,56 +333,9 @@ export default function App() {
           } 
         />
         
-        {/* POS Routes - Requires 'pos' permission */}
-        <Route 
-          path="/pos" 
-          element={
-            <ProtectedRoute requiredPermission="pos">
-              <POS />
-            </ProtectedRoute>
-          } 
-        />
+    
         
-        {/* Inventory Routes - Requires 'inventory' permission */}
-        <Route 
-          path="/inventory" 
-          element={
-            <ProtectedRoute requiredPermission="inventory">
-              <Inventory />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Purchases Routes - Requires 'purchases' permission */}
-        <Route 
-          path="/purchases" 
-          element={
-            <ProtectedRoute requiredPermission="purchases">
-              <Purchases />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Warehouses Routes - Requires 'warehouse' permission */}
-        <Route 
-          path="/warehouses" 
-          element={
-            <ProtectedRoute requiredPermission="warehouses">
-              <Warehouses />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* Reports Routes - Requires 'reports' permission */}
-        <Route 
-          path="/reports" 
-          element={
-            <ProtectedRoute requiredPermission="reports">
-              <Reports />
-            </ProtectedRoute>
-          } 
-        />
-        
+       
         {/* Payment Route - Only accessible by customers */}
         <Route 
           path="/payment" 

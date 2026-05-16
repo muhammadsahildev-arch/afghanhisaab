@@ -1,30 +1,23 @@
 const mongoose = require('mongoose');
 
 const customerTransactionSchema = new mongoose.Schema({
-  // Customer Information
+  // Customer Information (Required)
   name: {
     type: String,
     required: [true, 'Customer name is required'],
     trim: true
   },
   
-  // Sender Details
-  senderEmail: {
+  // Sender Details (Required)
+  senderName: {
     type: String,
-    required: [true, 'Sender email is required'],
-    lowercase: true,
-    trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  senderPhone: {
-    type: String,
-    required: [true, 'Sender phone is required'],
+    required: [true, 'Sender name is required'],
     trim: true
   },
   senderCurrency: {
     type: String,
     required: true,
-    enum: ['USD', 'EUR', 'GBP', 'PKR', 'AED', 'SAR', 'AFN'],
+    enum: ['USD', 'EUR', 'GBP', 'PKR', 'AED', 'SAR', 'CAD', 'AUD'],
     default: 'USD'
   },
   senderAmount: {
@@ -32,104 +25,42 @@ const customerTransactionSchema = new mongoose.Schema({
     required: [true, 'Sender amount is required'],
     min: [0, 'Amount must be positive']
   },
-  senderCountry: {
-    type: String,
-    required: [true, 'Sender country is required'],
-    trim: true
-  },
-  senderState: {
-    type: String,
-    trim: true
-  },
-  senderCity: {
-    type: String,
-    trim: true
-  },
-  senderAddress: {
-    type: String,
-    required: [true, 'Sender address is required'],
-    trim: true
-  },
   
-  // Receiver Details
-  receiverEmail: {
+  // Receiver Details (Required)
+  receiverName: {
     type: String,
-    required: [true, 'Receiver email is required'],
-    lowercase: true,
-    trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  receiverPhone: {
-    type: String,
-    required: [true, 'Receiver phone is required'],
+    required: [true, 'Receiver name is required'],
     trim: true
   },
   receiverCurrency: {
     type: String,
     required: true,
-    enum: ['USD', 'EUR', 'GBP', 'PKR', 'AED', 'SAR', 'AFN'],
+    enum: ['USD', 'EUR', 'GBP', 'PKR', 'AED', 'SAR', 'CAD', 'AUD'],
     default: 'PKR'
   },
   receiverAmount: {
     type: Number,
     default: 0
   },
-  receiverCountry: {
-    type: String,
-    required: [true, 'Receiver country is required'],
-    trim: true
-  },
-  receiverState: {
-    type: String,
-    trim: true
-  },
-  receiverCity: {
-    type: String,
-    trim: true
-  },
-  receiverAddress: {
-    type: String,
-    required: [true, 'Receiver address is required'],
-    trim: true
-  },
   
-  // Fees & Charges
-  commission: {
-    type: Number,
-    default: 0,
-    min: 0
-  },
-  fee: {
-    type: Number,
-    default: 0,
-    min: 0
-  },
-  tax: {
-    type: Number,
-    default: 0,
-    min: 0
-  },
-  totalFees: {
-    type: Number,
-    default: 0
-  },
+  // Exchange Rate (Required)
   exchangeRate: {
     type: Number,
     required: [true, 'Exchange rate is required'],
     min: 0
   },
   
-  // Status
+  // Optional Fields
+  description: {
+    type: String,
+    trim: true
+  },
+  
+  // Status (Fixed to completed)
   status: {
     type: String,
     enum: ['pending', 'processing', 'completed', 'cancelled'],
-    default: 'pending'
-  },
-  
-  // Additional Notes
-  notes: {
-    type: String,
-    trim: true
+    default: 'completed'
   },
   
   // Transaction Date
@@ -153,36 +84,23 @@ const customerTransactionSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Calculate receiver amount and total fees before saving
+// Calculate receiver amount before saving
 customerTransactionSchema.pre('save', function(next) {
-  // Calculate receiver amount based on sender amount and exchange rate
   if (this.senderAmount && this.exchangeRate) {
-    const baseAmount = this.senderAmount * this.exchangeRate;
-    this.totalFees = (this.commission || 0) + (this.fee || 0) + (this.tax || 0);
-    this.receiverAmount = baseAmount - this.totalFees;
+    this.receiverAmount = this.senderAmount * this.exchangeRate;
   }
   next();
 });
 
-// Calculate receiver amount and total fees before update
+// Calculate receiver amount before update
 customerTransactionSchema.pre('findOneAndUpdate', async function(next) {
   const update = this.getUpdate();
   
-  if (update.senderAmount !== undefined || update.exchangeRate !== undefined ||
-      update.commission !== undefined || update.fee !== undefined || update.tax !== undefined) {
+  if (update.senderAmount !== undefined || update.exchangeRate !== undefined) {
     const doc = await this.model.findOne(this.getQuery());
-    
     const senderAmount = update.senderAmount !== undefined ? update.senderAmount : doc.senderAmount;
     const exchangeRate = update.exchangeRate !== undefined ? update.exchangeRate : doc.exchangeRate;
-    const commission = update.commission !== undefined ? update.commission : doc.commission;
-    const fee = update.fee !== undefined ? update.fee : doc.fee;
-    const tax = update.tax !== undefined ? update.tax : doc.tax;
-    
-    const baseAmount = senderAmount * exchangeRate;
-    const totalFees = commission + fee + tax;
-    
-    update.receiverAmount = baseAmount - totalFees;
-    update.totalFees = totalFees;
+    update.receiverAmount = senderAmount * exchangeRate;
   }
   
   next();

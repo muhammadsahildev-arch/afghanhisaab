@@ -3,8 +3,6 @@ const mongoose = require('mongoose');
 const entrySchema = new mongoose.Schema({
   description: {
     type: String,
-    required: [true, 'Description is required'],
-    trim: true
   },
   amount: {
     type: Number,

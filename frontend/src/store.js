@@ -6,41 +6,9 @@ import {
   singleUserDetailsReducer, 
   allUserReducer 
 } from './reducers/userReducers';
-import { 
-  allProductsReducer, 
-  productDetailsReducer, 
-  newProductReducer, 
-  updateProductReducer, 
-  deleteProductReducer,
-  addStockReducer 
-} from './reducers/productReducers';
-import { 
-  allWarehousesReducer, 
-  warehouseDetailsReducer, 
-  newWarehouseReducer, 
-  updateWarehouseReducer, 
-  deleteWarehouseReducer,
-  transferStockReducer,
-  allTransfersReducer 
-} from './reducers/warehouseReducers';
-import { 
-  allSuppliersReducer, 
-  supplierDetailsReducer, 
-  newSupplierReducer, 
-  updateSupplierReducer, 
-  deleteSupplierReducer,
-  allPurchaseOrdersReducer,
-  purchaseOrderDetailsReducer,
-  newPurchaseOrderReducer,
-  receiveStockReducer,
-  updateOrderStatusReducer 
-} from './reducers/purchaseReducers';
-import { 
-  allSalesReducer, 
-  saleDetailsReducer, 
-  newSaleReducer,
-  dailySalesSummaryReducer 
-} from './reducers/saleReducers';
+
+
+
 import { 
   allLedgerEntriesReducer, 
   ledgerEntryDetailsReducer, 
@@ -72,21 +40,9 @@ import {
   updateExpenseReducer, 
   deleteExpenseReducer 
 } from './reducers/expenseReducers';
-import { 
-  salesReportReducer, 
-  profitLossReportReducer, 
-  expenseReportReducer, 
-  discountReportReducer 
-} from './reducers/reportReducers';
-import { 
-  allRolesReducer, 
-  createRoleReducer, 
-  deleteRoleReducer,
-  allPermissionsReducer 
-} from './reducers/roleReducers';
+
 import { allPaymentProofsReducer, approvePaymentReducer, denyPaymentReducer, myPaymentStatusReducer, pendingPaymentsReducer, submitPaymentProofReducer } from './reducers/paymentReducers';
 import { systemAdminAllUsersReducer, systemAdminDeleteUserReducer } from './reducers/systemAdminReducers';
-import { createContactUsReducer } from './reducers/contactUsReducers';
 
 const store = configureStore({
   reducer: {
@@ -97,28 +53,7 @@ const store = configureStore({
     allUsers: allUserReducer,
     getSingleUser: singleUserDetailsReducer,
     
-    // Role & Permissions
-    allRoles: allRolesReducer,
-    createRole: createRoleReducer,
-    deleteRole: deleteRoleReducer,
-    allPermissions: allPermissionsReducer,
-    
-    // Products
-    allProducts: allProductsReducer,
-    productDetails: productDetailsReducer,
-    newProduct: newProductReducer,
-    updateProduct: updateProductReducer,
-    deleteProduct: deleteProductReducer,
-    addStock: addStockReducer,
-    
-    // Warehouses
-    allWarehouses: allWarehousesReducer,
-    warehouseDetails: warehouseDetailsReducer,
-    newWarehouse: newWarehouseReducer,
-    updateWarehouse: updateWarehouseReducer,
-    deleteWarehouse: deleteWarehouseReducer,
-    transferStock: transferStockReducer,
-    allTransfers: allTransfersReducer,
+   
 
 
       // Payment Management
@@ -129,23 +64,8 @@ const store = configureStore({
     denyPayment: denyPaymentReducer,
     myPaymentStatus: myPaymentStatusReducer,
     
-    // Purchases & Suppliers
-    allSuppliers: allSuppliersReducer,
-    supplierDetails: supplierDetailsReducer,
-    newSupplier: newSupplierReducer,
-    updateSupplier: updateSupplierReducer,
-    deleteSupplier: deleteSupplierReducer,
-    allPurchaseOrders: allPurchaseOrdersReducer,
-    purchaseOrderDetails: purchaseOrderDetailsReducer,
-    newPurchaseOrder: newPurchaseOrderReducer,
-    receiveStock: receiveStockReducer,
-    updateOrderStatus: updateOrderStatusReducer,
-    
-    // Sales
-    allSales: allSalesReducer,
-    saleDetails: saleDetailsReducer,
-    newSale: newSaleReducer,
-    dailySalesSummary: dailySalesSummaryReducer,
+   
+  
     
     // Ledger
     allLedgerEntries: allLedgerEntriesReducer,
@@ -178,12 +98,7 @@ const store = configureStore({
     updateExpense: updateExpenseReducer,
     deleteExpense: deleteExpenseReducer,
     
-    // Reports
-    salesReport: salesReportReducer,
-    profitLossReport: profitLossReportReducer,
-    expenseReport: expenseReportReducer,
-    discountReport: discountReportReducer,
-    createContactUs:createContactUsReducer,
+  
 
 
      // System Admin User Management

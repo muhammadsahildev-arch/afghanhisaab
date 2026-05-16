@@ -19,8 +19,6 @@ const formatLedgerEntry = (entry) => {
     amount: entry.amount,
     currency: entry.currency,
     remainingAmount: entry.remainingAmount,
-    remainingCurrency: entry.remainingCurrency,
-    remainingPersonName: entry.remainingPersonName,
     balance: entry.balance,
     status: entry.status,
     createdAt: entry.createdAt,
@@ -50,7 +48,10 @@ exports.createLedgerEntry = asyncHandler(async (req, res) => {
     const entry = entries[i];
     
     // Validate amount vs remaining amount
-    if (parseFloat(entry.amount) < parseFloat(entry.remainingAmount)) {
+    const amount = parseFloat(entry.amount);
+    const remainingAmount = entry.remainingAmount ? parseFloat(entry.remainingAmount) : amount;
+    
+    if (amount < remainingAmount) {
       errors.push({
         index: i,
         message: `Entry ${i + 1}: Remaining amount cannot be greater than total amount`
@@ -64,9 +65,7 @@ exports.createLedgerEntry = asyncHandler(async (req, res) => {
         name: entry.name,
         amount: parseFloat(entry.amount),
         currency: entry.currency,
-        remainingAmount: parseFloat(entry.remainingAmount),
-        remainingCurrency: entry.remainingCurrency,
-        remainingPersonName: entry.remainingPersonName,
+        remainingAmount: entry.remainingAmount ? parseFloat(entry.remainingAmount) : parseFloat(entry.amount),
         status: entry.status || 'active',
         entryDate: entry.entryDate || Date.now(),
         shopId: req.user.shopData.shopId,
@@ -115,8 +114,7 @@ exports.getLedgerEntries = asyncHandler(async (req, res) => {
   if (search) {
     query.$or = [
       { description: { $regex: search, $options: 'i' } },
-      { name: { $regex: search, $options: 'i' } },
-      { remainingPersonName: { $regex: search, $options: 'i' } }
+      { name: { $regex: search, $options: 'i' } }
     ];
   }
   
@@ -222,8 +220,6 @@ exports.updateLedgerEntry = asyncHandler(async (req, res) => {
     amount,
     currency,
     remainingAmount,
-    remainingCurrency,
-    remainingPersonName,
     status,
     entryDate
   } = req.body;
@@ -240,15 +236,13 @@ exports.updateLedgerEntry = asyncHandler(async (req, res) => {
   }
   
   // Update fields
-  if (description) entry.description = description;
-  if (name) entry.name = name;
-  if (amount) entry.amount = parseFloat(amount);
-  if (currency) entry.currency = currency;
-  if (remainingAmount) entry.remainingAmount = parseFloat(remainingAmount);
-  if (remainingCurrency) entry.remainingCurrency = remainingCurrency;
-  if (remainingPersonName) entry.remainingPersonName = remainingPersonName;
-  if (status) entry.status = status;
-  if (entryDate) entry.entryDate = entryDate;
+  if (description !== undefined) entry.description = description;
+  if (name !== undefined) entry.name = name;
+  if (amount !== undefined) entry.amount = parseFloat(amount);
+  if (currency !== undefined) entry.currency = currency;
+  if (remainingAmount !== undefined) entry.remainingAmount = parseFloat(remainingAmount);
+  if (status !== undefined) entry.status = status;
+  if (entryDate !== undefined) entry.entryDate = entryDate;
   
   // Recalculate balance
   entry.balance = entry.amount - entry.remainingAmount;

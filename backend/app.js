@@ -9,21 +9,13 @@ const path = require('path');
 require('dotenv').config({ path: './config/config.env' });
 
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
 const ledgerRoutes = require('./routes/ledgerRoutes');
 const dailyRecordRoutes = require('./routes/dailyRecordRoutes');
 const customerTransactionRoutes = require('./routes/customerTransactionRoutes');
-const productRoutes = require('./routes/productRoutes');
-const warehouseRoutes = require('./routes/warehouseRoutes');
-const purchaseRoutes = require('./routes/purchaseRoutes');
-const saleRoutes = require('./routes/saleRoutes');
-const reportRoutes = require('./routes/reportRoutes');
-const contactRoutes = require('./routes/contactRouter');
 
 const app = express();
 
 
-app.use('/api', contactRoutes);
 
 // Security middleware
 app.use(helmet({
@@ -108,16 +100,9 @@ app.use('/uploads', (req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api', userRoutes);
 app.use('/api', ledgerRoutes);
 app.use('/api', dailyRecordRoutes);
 app.use('/api', customerTransactionRoutes);
-app.use('/api', productRoutes);
-app.use('/api', warehouseRoutes);
-app.use('/api', purchaseRoutes);
-app.use('/api', saleRoutes);
-app.use('/api', reportRoutes);
-app.use('/cpi', contactRoutes);
 
   // Frontend Connect to Backend
 

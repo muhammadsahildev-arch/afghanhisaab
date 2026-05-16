@@ -48,41 +48,9 @@ const userSchema = new mongoose.Schema({
 
   // Customer Specific Data
   customerData: {
-    dateOfBirth: Date,
-    gender: {
-      type: String,
-    },
-    addressLine1: String,
-    addressLine2: String,
     city: String,
     state: String,
-    postalCode: String,
     country: String,
-    occupation: String,
-    companyName: String,
-    annualIncome: {
-      type: String,
-    },
-    purposeOfAccount: {
-      type: String,
-      default: 'personal'
-    },
-    currencyPreference: {
-      type: String,
-      default: 'USD'
-    },
-    newsletterSubscribed: {
-      type: Boolean,
-      default: false
-    },
-    smsAlerts: {
-      type: Boolean,
-      default: false
-    },
-    agreeMarketing: {
-      type: Boolean,
-      default: false
-    }
   },
 
   // Shop Users Data (for team members)

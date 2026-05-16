@@ -7,20 +7,10 @@ import {
   Edit,
   Trash2,
   Eye,
-  ChevronLeft,
-  ChevronRight,
   Download,
-  Filter,
   Wallet,
   X,
-  Menu,
-  LogOut,
-  Home,
-  Users,
-  Settings,
-  CreditCard,
   Calendar,
-  Bell,
   DollarSign,
   User,
   FileText,
@@ -29,7 +19,9 @@ import {
   CheckCircle,
   Clock,
   RefreshCw,
-  ArrowLeft
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown
 } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -44,7 +36,6 @@ import { DELETE_DAILY_RECORD_RESET } from "../../../constants/constants";
 const DailyRecords = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -56,200 +47,175 @@ const DailyRecords = () => {
   // Language translations
   const translations = {
     en: {
-      backToDashboard: "Back to Dashboard",
+      backToDashboard: "Back",
       dailyRecords: "Daily Records",
-      subtitle: "Manage your daily income and spend records",
+      subtitle: "Manage your daily transactions",
       searchPlaceholder: "Search records...",
       newRecord: "New Record",
-      exportToCSV: "Export to CSV",
-      totalRecords: "Total Records",
-      totalIncome: "Total Income",
-      totalSpend: "Total Spend",
-      netBalance: "Net Balance",
-      noRecordsFound: "No daily records found",
-      showing: "Showing",
-      to: "to",
-      of: "of",
-      entries: "entries",
+      exportToCSV: "Export",
+      totalRecords: "Total",
+      totalIncome: "Income",
+      totalSpend: "Spend",
+      netBalance: "Balance",
+      noRecordsFound: "No records found",
       recordDetails: "Record Details",
       date: "Date",
       day: "Day",
-      incomeEntries: "Income Entries",
-      spendEntries: "Spend Entries",
-      incomeDetails: "Income Details",
-      spendDetails: "Spend Details",
-      balanceDetails: "Balance Details",
-      actions: "Actions",
+      incomeEntries: "Income",
+      spendEntries: "Spend",
       description: "Description",
       amount: "Amount",
       currency: "Currency",
-      personName: "Person Name",
+      personName: "Person",
       noIncomeEntries: "No income entries",
       noSpendEntries: "No spend entries",
       summaryByCurrency: "Summary by Currency",
-      deleteRecord: "Delete Record",
-      deleteConfirmation: "Are you sure you want to delete the record from",
-      deleteWarning: "This action cannot be undone.",
+      deleteRecord: "Delete",
+      deleteConfirmation: "Delete record from",
+      deleteWarning: "This cannot be undone",
       delete: "Delete",
       cancel: "Cancel",
       deleting: "Deleting...",
-      editRecord: "Edit Record",
+      editRecord: "Edit",
+      viewDetails: "View",
       close: "Close",
-      loading: "Loading daily records...",
-      recordDeletedSuccess: "Daily record deleted successfully!",
+      loading: "Loading...",
+      recordDeletedSuccess: "Record deleted!",
       exportSuccess: "Exported",
       recordsSuccessfully: "records successfully!",
       noDataToExport: "No data to export",
-      exportFailed: "Failed to export data",
-      id: "ID"
+      exportFailed: "Export failed",
+      id: "ID",
+      actions: "Actions"
     },
     ur: {
-      backToDashboard: "ڈیش بورڈ پر واپس جائیں",
-      dailyRecords: "روزانہ کے ریکارڈز / روزنامه",
-      subtitle: "اپنے روزانہ کی آمدنی اور اخراجات کے ریکارڈز کا نظم کریں",
+      backToDashboard: "واپس",
+      dailyRecords: "روزانہ ریکارڈز",
+      subtitle: "اپنے روزانہ کے لین دین کا نظم کریں",
       searchPlaceholder: "ریکارڈز تلاش کریں...",
       newRecord: "نیا ریکارڈ",
-      exportToCSV: "CSV میں ایکسپورٹ کریں",
-      totalRecords: "کل ریکارڈز",
-      totalIncome: "کل آمدنی",
-      totalSpend: "کل اخراجات",
-      netBalance: "خالص بیلنس",
-      noRecordsFound: "کوئی روزانہ ریکارڈز نہیں ملے",
-      showing: "دکھا رہا ہے",
-      to: "سے",
-      of: "میں سے",
-      entries: "انٹریز",
+      exportToCSV: "برآمد",
+      totalRecords: "کل",
+      totalIncome: "آمدنی",
+      totalSpend: "اخراجات",
+      netBalance: "بیلنس",
+      noRecordsFound: "کوئی ریکارڈز نہیں ملے",
       recordDetails: "ریکارڈ کی تفصیلات",
       date: "تاریخ",
       day: "دن",
-      incomeEntries: "آمدنی کی انٹریز",
-      spendEntries: "اخراجات کی انٹریز",
-      incomeDetails: "آمدنی کی تفصیلات",
-      spendDetails: "اخراجات کی تفصیلات",
-      balanceDetails: "بیلنس کی تفصیلات",
-      actions: "اعمال",
+      incomeEntries: "آمدنی",
+      spendEntries: "اخراجات",
       description: "تفصیل",
       amount: "رقم",
       currency: "کرنسی",
-      personName: "شخص کا نام",
-      noIncomeEntries: "کوئی آمدنی کی انٹریز نہیں",
-      noSpendEntries: "کوئی اخراجات کی انٹریز نہیں",
+      personName: "شخص",
+      noIncomeEntries: "کوئی آمدنی نہیں",
+      noSpendEntries: "کوئی اخراجات نہیں",
       summaryByCurrency: "کرنسی کے لحاظ سے خلاصہ",
-      deleteRecord: "ریکارڈ حذف کریں",
-      deleteConfirmation: "کیا آپ واقعی کا ریکارڈ حذف کرنا چاہتے ہیں",
-      deleteWarning: "یہ عمل واپس نہیں کیا جا سکتا۔",
-      delete: "حذف کریں",
-      cancel: "منسوخ کریں",
+      deleteRecord: "حذف",
+      deleteConfirmation: "ریکارڈ حذف کریں",
+      deleteWarning: "یہ عمل واپس نہیں کیا جا سکتا",
+      delete: "حذف",
+      cancel: "منسوخ",
       deleting: "حذف ہو رہا ہے...",
-      editRecord: "ریکارڈ میں ترمیم کریں",
-      close: "بند کریں",
-      loading: "روزانہ ریکارڈز لوڈ ہو رہے ہیں...",
-      recordDeletedSuccess: "روزانہ ریکارڈ کامیابی سے حذف ہو گیا!",
-      exportSuccess: "ایکسپورٹ کیا گیا",
+      editRecord: "ترمیم",
+      viewDetails: "دیکھیں",
+      close: "بند",
+      loading: "لوڈ ہو رہا ہے...",
+      recordDeletedSuccess: "ریکارڈ حذف ہو گیا!",
+      exportSuccess: "برآمد ہو گیا",
       recordsSuccessfully: "ریکارڈز کامیابی سے!",
-      noDataToExport: "ایکسپورٹ کرنے کے لیے کوئی ڈیٹا نہیں",
-      exportFailed: "ڈیٹا ایکسپورٹ کرنے میں ناکامی",
-      id: "شناختی نمبر"
+      noDataToExport: "برآمد کرنے کے لیے کوئی ڈیٹا نہیں",
+      exportFailed: "برآمد نہیں ہو سکا",
+      id: "شناختی نمبر",
+      actions: "اعمال"
     },
     ps: {
-      backToDashboard: "بیرته ډشبورډ ته",
-      dailyRecords: "ورځني ریکارډونه / ورځپاڼه",
-      subtitle: "خپل ورځني عاید او لګښت ریکارډونه اداره کړئ",
+      backToDashboard: "بیرته",
+      dailyRecords: "ورځني ریکارډونه",
+      subtitle: "خپل ورځني معاملات اداره کړئ",
       searchPlaceholder: "ریکارډونه ولټوئ...",
       newRecord: "نوی ریکارډ",
-      exportToCSV: "CSV ته صادر کړئ",
-      totalRecords: "ټول ریکارډونه",
-      totalIncome: "ټول عاید",
-      totalSpend: "ټول لګښت",
-      netBalance: "خالص بیلانس",
-      noRecordsFound: "هیڅ ورځني ریکارډونه ونه موندل شول",
-      showing: "ښودل کیږي",
-      to: "ته",
-      of: "له",
-      entries: "ننوتنې",
+      exportToCSV: "صادرول",
+      totalRecords: "ټول",
+      totalIncome: "عاید",
+      totalSpend: "لګښت",
+      netBalance: "بیلانس",
+      noRecordsFound: "هیڅ ریکارډونه ونه موندل شول",
       recordDetails: "د ریکارډ توضیحات",
       date: "نیټه",
       day: "ورځ",
-      incomeEntries: "د عاید ننوتنې",
-      spendEntries: "د لګښت ننوتنې",
-      incomeDetails: "د عاید توضیحات",
-      spendDetails: "د لګښت توضیحات",
-      balanceDetails: "د بیلانس توضیحات",
-      actions: "کړنې",
+      incomeEntries: "عاید",
+      spendEntries: "لګښت",
       description: "تشریح",
       amount: "اندازه",
       currency: "اسعار",
-      personName: "د شخص نوم",
-      noIncomeEntries: "هیڅ عاید ننوتنې نشته",
-      noSpendEntries: "هیڅ لګښت ننوتنې نشته",
+      personName: "شخص",
+      noIncomeEntries: "هیڅ عاید نشته",
+      noSpendEntries: "هیڅ لګښت نشته",
       summaryByCurrency: "د اسعارو له مخې لنډیز",
-      deleteRecord: "ریکارډ ړنګ کړئ",
-      deleteConfirmation: "ایا تاسو واقعیا د ریکارډ ړنګول غواړئ",
-      deleteWarning: "دا عمل بیرته نه شي ګرځول کیدی.",
-      delete: "ړنګ کړئ",
-      cancel: "لغوه کړئ",
+      deleteRecord: "ړنګول",
+      deleteConfirmation: "ریکارډ ړنګ کړئ",
+      deleteWarning: "دا عمل بیرته نه شي ګرځول کیدی",
+      delete: "ړنګول",
+      cancel: "لغوه",
       deleting: "ړنګ کیږي...",
-      editRecord: "ریکارډ سم کړئ",
+      editRecord: "سمول",
+      viewDetails: "کتل",
       close: "تړل",
-      loading: "ورځني ریکارډونه بار کیږي...",
-      recordDeletedSuccess: "ورځنی ریکارډ په بریالیتوب سره ړنګ شو!",
+      loading: "بار کیږي...",
+      recordDeletedSuccess: "ریکارډ ړنګ شو!",
       exportSuccess: "صادر شو",
       recordsSuccessfully: "ریکارډونه په بریالیتوب سره!",
       noDataToExport: "د صادرولو لپاره معلومات نشته",
-      exportFailed: "د معلوماتو په صادرولو کې پاتې راغلی",
-      id: "شناختي نمبر"
+      exportFailed: "صادرول ناکام شو",
+      id: "شناختي نمبر",
+      actions: "کړنې"
     },
     fa: {
-      backToDashboard: "بازگشت به داشبورد",
-      dailyRecords: "رکوردهای روزانه / روزنامه",
-      subtitle: "مدیریت رکوردهای درآمد و هزینه روزانه شما",
+      backToDashboard: "بازگشت",
+      dailyRecords: "رکوردهای روزانه",
+      subtitle: "مدیریت تراکنش‌های روزانه شما",
       searchPlaceholder: "جستجوی رکوردها...",
       newRecord: "رکورد جدید",
-      exportToCSV: "خروجی به CSV",
-      totalRecords: "کل رکوردها",
-      totalIncome: "کل درآمد",
-      totalSpend: "کل هزینه",
-      netBalance: "موجودی خالص",
-      noRecordsFound: "هیچ رکورد روزانه‌ای یافت نشد",
-      showing: "نمایش",
-      to: "تا",
-      of: "از",
-      entries: "ورودی‌ها",
+      exportToCSV: "خروجی",
+      totalRecords: "کل",
+      totalIncome: "درآمد",
+      totalSpend: "هزینه",
+      netBalance: "موجودی",
+      noRecordsFound: "هیچ رکوردی یافت نشد",
       recordDetails: "جزئیات رکورد",
       date: "تاریخ",
       day: "روز",
-      incomeEntries: "ورودی‌های درآمد",
-      spendEntries: "ورودی‌های هزینه",
-      incomeDetails: "جزئیات درآمد",
-      spendDetails: "جزئیات هزینه",
-      balanceDetails: "جزئیات موجودی",
-      actions: "عملیات",
+      incomeEntries: "درآمد",
+      spendEntries: "هزینه",
       description: "توضیحات",
       amount: "مبلغ",
       currency: "ارز",
-      personName: "نام شخص",
-      noIncomeEntries: "هیچ ورودی درآمدی وجود ندارد",
-      noSpendEntries: "هیچ ورودی هزینه‌ای وجود ندارد",
+      personName: "شخص",
+      noIncomeEntries: "هیچ درآمدی وجود ندارد",
+      noSpendEntries: "هیچ هزینه‌ای وجود ندارد",
       summaryByCurrency: "خلاصه بر اساس ارز",
-      deleteRecord: "حذف رکورد",
-      deleteConfirmation: "آیا مطمئن هستید که می‌خواهید رکورد را حذف کنید",
-      deleteWarning: "این عمل قابل بازگشت نیست.",
+      deleteRecord: "حذف",
+      deleteConfirmation: "حذف رکورد",
+      deleteWarning: "این عمل قابل بازگشت نیست",
       delete: "حذف",
       cancel: "انصراف",
       deleting: "در حال حذف...",
-      editRecord: "ویرایش رکورد",
+      editRecord: "ویرایش",
+      viewDetails: "مشاهده",
       close: "بستن",
-      loading: "در حال بارگذاری رکوردهای روزانه...",
-      recordDeletedSuccess: "رکورد روزانه با موفقیت حذف شد!",
+      loading: "در حال بارگذاری...",
+      recordDeletedSuccess: "رکورد حذف شد!",
       exportSuccess: "خروجی گرفته شد",
       recordsSuccessfully: "رکوردها با موفقیت!",
       noDataToExport: "داده‌ای برای خروجی وجود ندارد",
-      exportFailed: "خطا در خروجی گرفتن داده‌ها",
-      id: "شناسه"
+      exportFailed: "خطا در خروجی گرفتن",
+      id: "شناسه",
+      actions: "عملیات"
     }
   };
 
-  // Get language from localStorage
   const [currentLang, setCurrentLang] = useState('en');
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -264,17 +230,20 @@ const DailyRecords = () => {
   const t = translations[currentLang] || translations.en;
   const isRTL = currentLang === 'ur' || currentLang === 'ps' || currentLang === 'fa';
 
-  // Get state from Redux
   const { records, loading, error, summary, pagination } = useSelector((state) => state.allDailyRecords);
   const { loading: deleteLoading, success: deleteSuccess, error: deleteError } = useSelector((state) => state.deleteDailyRecord);
 
-  // Fetch daily records on mount
+  // Sort records to show newest first (most recent date on top)
+  const getSortedRecords = () => {
+    if (!records) return [];
+    return [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+  };
+
   useEffect(() => {
     dispatch(getAllDailyRecordsAction(currentPage, itemsPerPage, searchTerm));
     dispatch(getDailyRecordStatsAction());
   }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
-  // Handle delete success
   useEffect(() => {
     if (deleteSuccess) {
       toast.success(t.recordDeletedSuccess);
@@ -287,7 +256,6 @@ const DailyRecords = () => {
     }
   }, [deleteSuccess, dispatch, currentPage, itemsPerPage, searchTerm, t]);
 
-  // Handle errors
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -299,7 +267,6 @@ const DailyRecords = () => {
     }
   }, [error, deleteError, dispatch]);
 
-  // Format date
   const formatDate = (date) => {
     if (!date) return 'N/A';
     return new Date(date).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'ur-PK', {
@@ -309,131 +276,65 @@ const DailyRecords = () => {
     });
   };
 
-  // Get currency symbol
   const getCurrencySymbol = (currency) => {
     const symbols = {
-      USD: '$', 
-      EUR: '€', 
-      GBP: '£', 
-      PKR: '₨', 
-      AED: 'د.إ', 
-      SAR: 'ر.س', 
-      AFN: '؋',
-      INR: '₹',
-      CAD: 'C$',
-      AUD: 'A$',
-      JPY: '¥',
-      CNY: '¥'
+      USD: '$', EUR: '€', GBP: '£', PKR: '₨', 
+      AED: 'د.إ', SAR: 'ر.س', AFN: '؋', INR: '₹'
     };
     return symbols[currency] || currency || '$';
   };
 
-  // Format amount with currency symbol
   const formatAmount = (amount, currency) => {
     if (!amount && amount !== 0) return 'N/A';
     const symbol = getCurrencySymbol(currency);
-    const formattedAmount = amount.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-    return `${symbol} ${formattedAmount}`;
+    return `${symbol} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
-  // Calculate totals by currency from records
   const getTotalsByCurrency = () => {
-    const totals = {
-      income: {},
-      spend: {},
-      balance: {}
-    };
-    
+    const totals = { income: {}, spend: {}, balance: {} };
     (records || []).forEach(record => {
-      // Process income entries
-      if (record.incomeEntries && Array.isArray(record.incomeEntries)) {
-        record.incomeEntries.forEach(entry => {
-          if (entry.amount && entry.currency) {
-            if (!totals.income[entry.currency]) {
-              totals.income[entry.currency] = 0;
-            }
-            totals.income[entry.currency] += entry.amount;
-          }
-        });
-      }
-      
-      // Process spend entries
-      if (record.spendEntries && Array.isArray(record.spendEntries)) {
-        record.spendEntries.forEach(entry => {
-          if (entry.amount && entry.currency) {
-            if (!totals.spend[entry.currency]) {
-              totals.spend[entry.currency] = 0;
-            }
-            totals.spend[entry.currency] += entry.amount;
-          }
-        });
-      }
+      record.incomeEntries?.forEach(entry => {
+        if (entry.amount && entry.currency) {
+          totals.income[entry.currency] = (totals.income[entry.currency] || 0) + entry.amount;
+        }
+      });
+      record.spendEntries?.forEach(entry => {
+        if (entry.amount && entry.currency) {
+          totals.spend[entry.currency] = (totals.spend[entry.currency] || 0) + entry.amount;
+        }
+      });
     });
-    
-    // Calculate balance by currency
     const allCurrencies = new Set([...Object.keys(totals.income), ...Object.keys(totals.spend)]);
     allCurrencies.forEach(currency => {
-      const income = totals.income[currency] || 0;
-      const spend = totals.spend[currency] || 0;
-      totals.balance[currency] = income - spend;
+      totals.balance[currency] = (totals.income[currency] || 0) - (totals.spend[currency] || 0);
     });
-    
     return totals;
   };
 
-  // Calculate per-currency totals for a single record
-  const getRecordTotalsByCurrency = (record) => {
-    const totals = {
-      income: {},
-      spend: {},
-      balance: {}
-    };
-    
-    // Process income entries
-    if (record.incomeEntries && Array.isArray(record.incomeEntries)) {
-      record.incomeEntries.forEach(entry => {
-        if (entry.amount && entry.currency) {
-          if (!totals.income[entry.currency]) {
-            totals.income[entry.currency] = 0;
-          }
-          totals.income[entry.currency] += entry.amount;
-        }
-      });
-    }
-    
-    // Process spend entries
-    if (record.spendEntries && Array.isArray(record.spendEntries)) {
-      record.spendEntries.forEach(entry => {
-        if (entry.amount && entry.currency) {
-          if (!totals.spend[entry.currency]) {
-            totals.spend[entry.currency] = 0;
-          }
-          totals.spend[entry.currency] += entry.amount;
-        }
-      });
-    }
-    
-    // Calculate balance by currency
+  const getRecordTotals = (record) => {
+    const totals = { income: {}, spend: {}, balance: {} };
+    record.incomeEntries?.forEach(entry => {
+      if (entry.amount && entry.currency) {
+        totals.income[entry.currency] = (totals.income[entry.currency] || 0) + entry.amount;
+      }
+    });
+    record.spendEntries?.forEach(entry => {
+      if (entry.amount && entry.currency) {
+        totals.spend[entry.currency] = (totals.spend[entry.currency] || 0) + entry.amount;
+      }
+    });
     const allCurrencies = new Set([...Object.keys(totals.income), ...Object.keys(totals.spend)]);
     allCurrencies.forEach(currency => {
-      const income = totals.income[currency] || 0;
-      const spend = totals.spend[currency] || 0;
-      totals.balance[currency] = income - spend;
+      totals.balance[currency] = (totals.income[currency] || 0) - (totals.spend[currency] || 0);
     });
-    
     return totals;
   };
 
-  // Get day name from date
   const getDayName = (date) => {
     if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'ur-PK', { weekday: 'long' });
+    return new Date(date).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'ur-PK', { weekday: 'short' });
   };
 
-  // Handle delete
   const handleDeleteClick = (record) => {
     setSelectedRecord(record);
     setShowDeleteModal(true);
@@ -446,90 +347,64 @@ const DailyRecords = () => {
     }
   };
 
-  // Handle view details
   const handleViewDetails = (record) => {
     setSelectedRecord(record);
     setShowDetailsModal(true);
   };
 
-  // Handle edit
   const handleEdit = (id) => {
     navigate(`/daily-records/${id}`);
   };
 
-  // Handle search
   const handleSearch = (term) => {
     setSearchTerm(term);
     setCurrentPage(1);
   };
 
-  // Handle export - frontend only download
   const handleExport = () => {
     try {
       const dataToExport = records || [];
-      
       if (!dataToExport || dataToExport.length === 0) {
         toast.error(t.noDataToExport);
         return;
       }
       
-      // Prepare CSV headers
-      const headers = [
-        t.id, t.date, t.day, 'Income Details', 'Spend Details', 'Net Balance Details'
-      ];
-      
+      const headers = ['ID', 'Date', 'Day', 'Income Details', 'Spend Details', 'Net Balance'];
       const csvRows = [headers.join(',')];
       
-      // Add data rows
       dataToExport.forEach(record => {
-        const recordTotals = getRecordTotalsByCurrency(record);
+        const recordTotals = getRecordTotals(record);
         const incomeStr = Object.entries(recordTotals.income).map(([curr, amt]) => `${getCurrencySymbol(curr)}${amt}`).join('; ');
         const spendStr = Object.entries(recordTotals.spend).map(([curr, amt]) => `${getCurrencySymbol(curr)}${amt}`).join('; ');
         const balanceStr = Object.entries(recordTotals.balance).map(([curr, amt]) => `${getCurrencySymbol(curr)}${amt}`).join('; ');
         
-        const row = [
-          record.id,
-          record.date ? formatDate(record.date) : 'N/A',
-          getDayName(record.date),
-          `"${incomeStr}"`,
-          `"${spendStr}"`,
-          `"${balanceStr}"`
-        ];
+        const row = [record.id, formatDate(record.date), getDayName(record.date), `"${incomeStr}"`, `"${spendStr}"`, `"${balanceStr}"`];
         csvRows.push(row.join(','));
       });
       
-      // Create and download CSV file
       const csvContent = csvRows.join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      
       link.setAttribute('href', url);
-      link.setAttribute('download', `daily_records_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `daily_records_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
       toast.success(`${t.exportSuccess} ${dataToExport.length} ${t.recordsSuccessfully}`);
     } catch (err) {
-      console.error('Export error:', err);
       toast.error(t.exportFailed);
     }
   };
 
-  // Get current items for pagination
-  const currentItems = records || [];
-
-  // Calculate totals from summary or from records
-  const totalRecords = summary?.totalRecords || records?.length || 0;
-  
-  // Get totals by currency
   const totalsByCurrency = getTotalsByCurrency();
+  const totalRecords = summary?.totalRecords || records?.length || 0;
+  const sortedRecords = getSortedRecords();
 
   if (!isInitialized || (loading && !records)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">{t.loading}</p>
@@ -539,463 +414,383 @@ const DailyRecords = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header with Back Button */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center gap-3" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <Link to="/dashboard">
-              <button className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <ArrowLeft size={18} />
-                <span>{t.backToDashboard}</span>
-              </button>
-            </Link>
-            <div className="h-8 w-px bg-gray-300"></div>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                {t.dailyRecords}
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
-            </div>
+    <div className="min-h-screen bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <Link to="/dashboard" className="p-2 -ml-2 active:bg-gray-100 rounded-full">
+            <ArrowLeft size={24} className="text-gray-600" />
+          </Link>
+          <div className="text-center">
+            <h1 className="text-lg font-bold text-gray-800">{t.dailyRecords}</h1>
+            <p className="text-xs text-gray-500">{t.subtitle}</p>
           </div>
-
-          <div className="flex items-center space-x-3" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder={t.searchPlaceholder}
-                className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 w-64"
-              />
-            </div>
-
-            {/* Create New Button */}
+          <div className="flex gap-2">
+            <button onClick={handleExport} className="p-2 bg-gray-100 rounded-full active:bg-gray-200">
+              <Download size={18} className="text-gray-600" />
+            </button>
             <Link to="/daily-records-create">
-              <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 flex items-center space-x-2 shadow-lg" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <Plus size={18} />
+              <button className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-1 shadow-lg">
+                <Plus size={16} />
                 <span>{t.newRecord}</span>
               </button>
             </Link>
-
-            {/* Export Button */}
-            <button 
-              onClick={handleExport} 
-              className="p-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-              title={t.exportToCSV}
-            >
-              <Download size={18} className="text-gray-600" />
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="p-4 lg:p-8">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
-            <div className="flex items-center justify-between" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <div>
-                <p className="text-sm opacity-90">{t.totalRecords}</p>
-                <p className="text-2xl font-bold mt-1">{totalRecords}</p>
-              </div>
-              <Calendar size={24} className="opacity-50" />
-            </div>
-          </div>
+      {/* Search Bar */}
+      <div className="p-4 bg-white border-b border-gray-100">
+        <div className="relative">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder={t.searchPlaceholder}
+            className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all"
+          />
+        </div>
+      </div>
 
-          {/* Total Income Card - Shows per currency */}
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
-            <div className="flex items-center justify-between mb-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <p className="text-sm opacity-90">{t.totalIncome}</p>
-              <DollarSign size={24} className="opacity-50" />
-            </div>
-            <div className="space-y-1">
-              {Object.keys(totalsByCurrency.income).length > 0 ? (
-                Object.entries(totalsByCurrency.income).map(([currency, amount]) => (
-                  <p key={currency} className="text-lg font-bold">
-                    {formatAmount(amount, currency)}
-                  </p>
-                ))
-              ) : (
-                <p className="text-lg font-bold">{formatAmount(0, 'USD')}</p>
-              )}
-            </div>
+      {/* Stats Cards - Grid Layout (No Scroll) */}
+      <div className="p-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 text-white">
+            <p className="text-xs opacity-90">{t.totalRecords}</p>
+            <p className="text-2xl font-bold mt-1">{totalRecords}</p>
           </div>
-
-          {/* Total Spend Card - Shows per currency */}
-          <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-4 text-white">
-            <div className="flex items-center justify-between mb-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <p className="text-sm opacity-90">{t.totalSpend}</p>
-              <CreditCard size={24} className="opacity-50" />
-            </div>
-            <div className="space-y-1">
-              {Object.keys(totalsByCurrency.spend).length > 0 ? (
-                Object.entries(totalsByCurrency.spend).map(([currency, amount]) => (
-                  <p key={currency} className="text-lg font-bold">
-                    {formatAmount(amount, currency)}
-                  </p>
-                ))
-              ) : (
-                <p className="text-lg font-bold">{formatAmount(0, 'USD')}</p>
-              )}
-            </div>
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 text-white">
+            <p className="text-xs opacity-90">{t.totalIncome}</p>
+            {Object.keys(totalsByCurrency.income).length > 0 ? (
+              Object.entries(totalsByCurrency.income).map(([currency, amount]) => (
+                <p key={currency} className="text-sm font-bold mt-1">
+                  {formatAmount(amount, currency)}
+                </p>
+              ))
+            ) : (
+              <p className="text-sm font-bold mt-1">{formatAmount(0, 'USD')}</p>
+            )}
           </div>
-
-          {/* Net Balance Card - Shows per currency */}
-          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
-            <div className="flex items-center justify-between mb-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <p className="text-sm opacity-90">{t.netBalance}</p>
-              <Wallet size={24} className="opacity-50" />
-            </div>
-            <div className="space-y-1">
-              {Object.keys(totalsByCurrency.balance).length > 0 ? (
-                Object.entries(totalsByCurrency.balance).map(([currency, amount]) => (
-                  <p key={currency} className="text-lg font-bold">
-                    {formatAmount(amount, currency)}
-                  </p>
-                ))
-              ) : (
-                <p className="text-lg font-bold">{formatAmount(0, 'USD')}</p>
-              )}
-            </div>
+          <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl p-4 text-white">
+            <p className="text-xs opacity-90">{t.totalSpend}</p>
+            {Object.keys(totalsByCurrency.spend).length > 0 ? (
+              Object.entries(totalsByCurrency.spend).map(([currency, amount]) => (
+                <p key={currency} className="text-sm font-bold mt-1">
+                  {formatAmount(amount, currency)}
+                </p>
+              ))
+            ) : (
+              <p className="text-sm font-bold mt-1">{formatAmount(0, 'USD')}</p>
+            )}
+          </div>
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-4 text-white">
+            <p className="text-xs opacity-90">{t.netBalance}</p>
+            {Object.keys(totalsByCurrency.balance).length > 0 ? (
+              Object.entries(totalsByCurrency.balance).map(([currency, amount]) => (
+                <p key={currency} className="text-sm font-bold mt-1">
+                  {formatAmount(amount, currency)}
+                </p>
+              ))
+            ) : (
+              <p className="text-sm font-bold mt-1">{formatAmount(0, 'USD')}</p>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Records Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
-        >
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">#</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.date}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.day}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.incomeEntries}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.spendEntries}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.incomeDetails}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.spendDetails}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.balanceDetails}</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">{t.actions}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {currentItems.map((record, index) => {
-                  const recordTotals = getRecordTotalsByCurrency(record);
-                  return (
-                    <tr key={record.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-gray-600">{index + 1}</td>
-                      <td className="px-6 py-4 font-medium text-gray-900">{formatDate(record.date)}</td>
-                      <td className="px-6 py-4 text-gray-600">{getDayName(record.date)}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                          {record.incomeEntries?.length || 0} {t.entries}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
-                          {record.spendEntries?.length || 0} {t.entries}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="space-y-1">
-                          {Object.entries(recordTotals.income).map(([currency, amount]) => (
-                            <span key={currency} className="text-green-600 font-medium block text-sm">
-                              {formatAmount(amount, currency)}
-                            </span>
-                          ))}
-                          {Object.keys(recordTotals.income).length === 0 && (
-                            <span className="text-gray-400 text-sm">-</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="space-y-1">
-                          {Object.entries(recordTotals.spend).map(([currency, amount]) => (
-                            <span key={currency} className="text-red-600 font-medium block text-sm">
-                              {formatAmount(amount, currency)}
-                            </span>
-                          ))}
-                          {Object.keys(recordTotals.spend).length === 0 && (
-                            <span className="text-gray-400 text-sm">-</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="space-y-1">
-                          {Object.entries(recordTotals.balance).map(([currency, amount]) => (
-                            <span key={currency} className={`font-medium block text-sm ${
-                              amount >= 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {formatAmount(amount, currency)}
-                            </span>
-                          ))}
-                          {Object.keys(recordTotals.balance).length === 0 && (
-                            <span className="text-gray-400 text-sm">-</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex space-x-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                          <button
-                            onClick={() => handleViewDetails(record)}
-                            className="p-1 hover:bg-blue-100 rounded transition-colors"
-                            title={t.recordDetails}
-                          >
-                            <Eye size={16} className="text-blue-600" />
-                          </button>
-                          <button
-                            onClick={() => handleEdit(record.id)}
-                            className="p-1 hover:bg-green-100 rounded transition-colors"
-                            title={t.editRecord}
-                          >
-                            <Edit size={16} className="text-green-600" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(record)}
-                            className="p-1 hover:bg-red-100 rounded transition-colors"
-                            title={t.deleteRecord}
-                          >
-                            <Trash2 size={16} className="text-red-600" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {currentItems.length === 0 && (
-                  <tr>
-                    <td colSpan="9" className="px-6 py-12 text-center text-gray-500">
-                      {t.noRecordsFound}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+      {/* Records List - Card View with Visible Actions - Sorted to show newest first */}
+      <div className="px-4 pb-24">
+        <div className="space-y-3">
+          {sortedRecords.map((record) => {
+            const recordTotals = getRecordTotals(record);
+            
+            return (
+              <motion.div
+                key={record.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+              >
+                {/* Record Header */}
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-gray-800">{formatDate(record.date)}</p>
+                    <p className="text-xs text-gray-500">{getDayName(record.date)}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleViewDetails(record)}
+                      className="p-2 rounded-lg bg-blue-50 active:bg-blue-100 transition-colors"
+                      title={t.viewDetails}
+                    >
+                      <Eye size={16} className="text-blue-600" />
+                    </button>
+                    <button
+                      onClick={() => handleEdit(record.id)}
+                      className="p-2 rounded-lg bg-green-50 active:bg-green-100 transition-colors"
+                      title={t.editRecord}
+                    >
+                      <Edit size={16} className="text-green-600" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(record)}
+                      className="p-2 rounded-lg bg-red-50 active:bg-red-100 transition-colors"
+                      title={t.deleteRecord}
+                    >
+                      <Trash2 size={16} className="text-red-600" />
+                    </button>
+                  </div>
+                </div>
 
-          {/* Pagination */}
-          {pagination && pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <div className="text-sm text-gray-500">
-                {t.showing} {pagination.page * pagination.limit - pagination.limit + 1} {t.to} {Math.min(pagination.page * pagination.limit, pagination.total)} {t.of} {pagination.total} {t.entries}
-              </div>
-              <div className="flex space-x-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                >
-                  <ChevronLeft size={16} />
+                {/* Record Content */}
+                <div className="p-4">
+                  {/* Income Section */}
+                  {record.incomeEntries?.length > 0 && (
+                    <div className="mb-3">
+                      <div className="flex items-center gap-1 mb-2">
+                        <TrendingUp size={14} className="text-green-600" />
+                        <span className="text-xs font-medium text-green-600">{t.income}</span>
+                        <span className="text-xs text-gray-400 ml-1">({record.incomeEntries.length})</span>
+                      </div>
+                      <div className="space-y-1">
+                        {record.incomeEntries.slice(0, 2).map((entry, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex-1">
+                              <p className="text-gray-700">{entry.description || '-'}</p>
+                              <p className="text-xs text-gray-400">{entry.personName}</p>
+                            </div>
+                            <p className="font-medium text-green-600">
+                              {formatAmount(entry.amount, entry.currency)}
+                            </p>
+                          </div>
+                        ))}
+                        {record.incomeEntries.length > 2 && (
+                          <p className="text-xs text-gray-400 text-center pt-1">
+                            +{record.incomeEntries.length - 2} more
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Spend Section */}
+                  {record.spendEntries?.length > 0 && (
+                    <div className="mb-3">
+                      <div className="flex items-center gap-1 mb-2">
+                        <TrendingDown size={14} className="text-red-600" />
+                        <span className="text-xs font-medium text-red-600">{t.spend}</span>
+                        <span className="text-xs text-gray-400 ml-1">({record.spendEntries.length})</span>
+                      </div>
+                      <div className="space-y-1">
+                        {record.spendEntries.slice(0, 2).map((entry, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex-1">
+                              <p className="text-gray-700">{entry.description || '-'}</p>
+                              <p className="text-xs text-gray-400">{entry.personName}</p>
+                            </div>
+                            <p className="font-medium text-red-600">
+                              {formatAmount(entry.amount, entry.currency)}
+                            </p>
+                          </div>
+                        ))}
+                        {record.spendEntries.length > 2 && (
+                          <p className="text-xs text-gray-400 text-center pt-1">
+                            +{record.spendEntries.length - 2} more
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Balance Summary */}
+                  <div className={`pt-3 mt-2 border-t border-gray-100 flex items-center justify-between ${
+                    Object.values(recordTotals.balance).some(b => b >= 0) ? 'bg-green-50 -mx-4 px-4 py-2' : 'bg-red-50 -mx-4 px-4 py-2'
+                  }`}>
+                    <span className="text-xs font-medium text-gray-600">{t.netBalance}</span>
+                    <div className="text-right">
+                      {Object.entries(recordTotals.balance).map(([currency, amount]) => (
+                        <p key={currency} className={`text-sm font-bold ${amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatAmount(amount, currency)}
+                        </p>
+                      ))}
+                      {Object.keys(recordTotals.balance).length === 0 && (
+                        <p className="text-sm text-gray-400">-</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+
+          {(!sortedRecords || sortedRecords.length === 0) && (
+            <div className="text-center py-12">
+              <Wallet size={48} className="mx-auto text-gray-300 mb-3" />
+              <p className="text-gray-500">{t.noRecordsFound}</p>
+              <Link to="/daily-records-create">
+                <button className="mt-4 px-6 py-2 bg-green-500 text-white rounded-xl text-sm font-medium">
+                  {t.newRecord}
                 </button>
-                {[...Array(Math.min(pagination.totalPages, 5))].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                      currentPage === i + 1
-                        ? 'bg-gradient-to-r from-green-500 to-red-500 text-white'
-                        : 'border border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, pagination.totalPages))}
-                  disabled={currentPage === pagination.totalPages}
-                  className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
+              </Link>
             </div>
           )}
-        </motion.div>
-      </main>
+        </div>
+
+        {/* Pagination */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm disabled:opacity-50 active:bg-gray-50"
+            >
+              {isRTL ? '→' : '←'} Previous
+            </button>
+            <span className="text-sm text-gray-500">
+              Page {currentPage} of {pagination.totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, pagination.totalPages))}
+              disabled={currentPage === pagination.totalPages}
+              className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm disabled:opacity-50 active:bg-gray-50"
+            >
+              Next {isRTL ? '←' : '→'}
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* View Details Modal */}
       {showDetailsModal && selectedRecord && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDetailsModal(false)}></div>
           
-          <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full max-w-4xl">
+          <div className="flex min-h-full items-end sm:items-center justify-center p-4">
+            <div className="relative transform overflow-hidden rounded-3xl bg-white w-full max-w-md shadow-2xl animate-slideUp">
               {/* Modal Header */}
-              <div className="bg-gradient-to-r from-green-600 to-red-600 px-6 py-4 flex items-center justify-between" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <h3 className="text-lg font-semibold text-white flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <Info className="w-5 h-5 mr-2" />
-                  {t.recordDetails} - {formatDate(selectedRecord.date)}
+              <div className="bg-gradient-to-r from-green-600 to-red-600 px-5 py-4 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">
+                  {t.recordDetails}
                 </h3>
-                <button onClick={() => setShowDetailsModal(false)} className="text-white hover:text-gray-200">
+                <button onClick={() => setShowDetailsModal(false)} className="text-white">
                   <X size={20} />
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 max-h-[70vh] overflow-y-auto">
-                {/* Date and Day Info */}
-                <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                  <div className="flex items-center justify-between" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <div className="flex items-center space-x-4" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                      <div className="flex items-center space-x-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                        <Calendar size={16} className="text-green-600" />
-                        <span className="font-medium">{t.date}:</span>
-                        <span>{formatDate(selectedRecord.date)}</span>
-                      </div>
-                      <div className="flex items-center space-x-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                        <Clock size={16} className="text-green-600" />
-                        <span className="font-medium">{t.day}:</span>
-                        <span>{getDayName(selectedRecord.date)}</span>
-                      </div>
+              <div className="p-5 max-h-[70vh] overflow-y-auto">
+                {/* Date */}
+                <div className="mb-5 p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} className="text-green-600" />
+                      <span className="text-sm text-gray-600">{formatDate(selectedRecord.date)}</span>
                     </div>
-                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                      {t.id}: #{selectedRecord.id}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <Clock size={16} className="text-green-600" />
+                      <span className="text-sm text-gray-600">{getDayName(selectedRecord.date)}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Income Section */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-bold text-gray-900 mb-3 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <DollarSign className="w-5 h-5 mr-2 text-green-600" />
-                    {t.incomeEntries}
-                  </h4>
-                  <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="text-left text-xs text-gray-500 border-b border-green-200">
-                          <th className="pb-2">{t.description}</th>
-                          <th className="pb-2">{t.amount}</th>
-                          <th className="pb-2">{t.currency}</th>
-                          <th className="pb-2">{t.personName}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedRecord.incomeEntries?.map((entry, idx) => (
-                          <tr key={idx} className="border-b border-green-100">
-                            <td className="py-2 text-sm">{entry.description}</td>
-                            <td className="py-2 text-sm font-medium text-green-600">
-                              {formatAmount(entry.amount, entry.currency)}
-                            </td>
-                            <td className="py-2 text-sm">{entry.currency}</td>
-                            <td className="py-2 text-sm">{entry.personName}</td>
-                          </tr>
-                        ))}
-                        {selectedRecord.incomeEntries?.length === 0 && (
-                          <tr>
-                            <td colSpan="4" className="py-2 text-sm text-gray-500 text-center">
-                              {t.noIncomeEntries}
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Spend Section */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-bold text-gray-900 mb-3 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <DollarSign className="w-5 h-5 mr-2 text-red-600" />
-                    {t.spendEntries}
-                  </h4>
-                  <div className="bg-red-50 rounded-xl p-4 border border-red-200">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="text-left text-xs text-gray-500 border-b border-red-200">
-                          <th className="pb-2">{t.description}</th>
-                          <th className="pb-2">{t.amount}</th>
-                          <th className="pb-2">{t.currency}</th>
-                          <th className="pb-2">{t.personName}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedRecord.spendEntries?.map((entry, idx) => (
-                          <tr key={idx} className="border-b border-red-100">
-                            <td className="py-2 text-sm">{entry.description}</td>
-                            <td className="py-2 text-sm font-medium text-red-600">
-                              {formatAmount(entry.amount, entry.currency)}
-                            </td>
-                            <td className="py-2 text-sm">{entry.currency}</td>
-                            <td className="py-2 text-sm">{entry.personName}</td>
-                          </tr>
-                        ))}
-                        {selectedRecord.spendEntries?.length === 0 && (
-                          <tr>
-                            <td colSpan="4" className="py-2 text-sm text-gray-500 text-center">
-                              {t.noSpendEntries}
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* Summary by Currency */}
-                <div className="p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200">
-                  <h4 className="font-bold text-gray-800 mb-3">{t.summaryByCurrency}</h4>
-                  {(() => {
-                    const recordTotals = getRecordTotalsByCurrency(selectedRecord);
-                    const allCurrencies = new Set([...Object.keys(recordTotals.income), ...Object.keys(recordTotals.spend)]);
-                    
-                    if (allCurrencies.size === 0) {
-                      return <p className="text-gray-500 text-center">{t.noRecordsFound}</p>;
-                    }
-                    
-                    return (
-                      <div className="space-y-3">
-                        {Array.from(allCurrencies).map(currency => {
-                          const income = recordTotals.income[currency] || 0;
-                          const spend = recordTotals.spend[currency] || 0;
-                          const balance = income - spend;
-                          return (
-                            <div key={currency} className="grid grid-cols-3 gap-4 text-center">
-                              <div>
-                                <p className="text-xs text-gray-500">{t.totalIncome}</p>
-                                <p className="text-sm font-bold text-green-600">
-                                  {formatAmount(income, currency)}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500">{t.totalSpend}</p>
-                                <p className="text-sm font-bold text-red-600">
-                                  {formatAmount(spend, currency)}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-500">{t.netBalance}</p>
-                                <p className={`text-sm font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                  {formatAmount(balance, currency)}
-                                </p>
-                              </div>
+                {/* Income Entries */}
+                {selectedRecord.incomeEntries?.length > 0 && (
+                  <div className="mb-5">
+                    <h4 className="font-semibold text-green-600 mb-2 flex items-center gap-1">
+                      <DollarSign size={16} />
+                      {t.incomeEntries} ({selectedRecord.incomeEntries.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedRecord.incomeEntries.map((entry, idx) => (
+                        <div key={idx} className="bg-green-50 p-3 rounded-xl">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-800">{entry.description || '-'}</p>
+                              <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                <User size={10} />
+                                {entry.personName}
+                              </p>
                             </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })()}
-                </div>
+                            <p className="font-bold text-green-600">
+                              {formatAmount(entry.amount, entry.currency)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Spend Entries */}
+                {selectedRecord.spendEntries?.length > 0 && (
+                  <div className="mb-5">
+                    <h4 className="font-semibold text-red-600 mb-2 flex items-center gap-1">
+                      <DollarSign size={16} />
+                      {t.spendEntries} ({selectedRecord.spendEntries.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedRecord.spendEntries.map((entry, idx) => (
+                        <div key={idx} className="bg-red-50 p-3 rounded-xl">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-800">{entry.description || '-'}</p>
+                              <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                <User size={10} />
+                                {entry.personName}
+                              </p>
+                            </div>
+                            <p className="font-bold text-red-600">
+                              {formatAmount(entry.amount, entry.currency)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Summary */}
+                {(() => {
+                  const totals = getRecordTotals(selectedRecord);
+                  const currencies = new Set([...Object.keys(totals.income), ...Object.keys(totals.spend)]);
+                  if (currencies.size === 0) return null;
+                  
+                  return (
+                    <div className="p-3 bg-gray-100 rounded-xl">
+                      <h4 className="font-semibold text-gray-700 mb-2 text-sm">{t.summaryByCurrency}</h4>
+                      {Array.from(currencies).map(currency => {
+                        const income = totals.income[currency] || 0;
+                        const spend = totals.spend[currency] || 0;
+                        const balance = income - spend;
+                        return (
+                          <div key={currency} className="flex justify-between items-center text-sm mb-1 last:mb-0">
+                            <span className="text-gray-600">{currency}</span>
+                            <div className="flex gap-3">
+                              <span className="text-green-600">+{formatAmount(income, currency)}</span>
+                              <span className="text-red-600">-{formatAmount(spend, currency)}</span>
+                              <span className={balance >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                                ={formatAmount(balance, currency)}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Modal Footer */}
-              <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <Link to={`/daily-records/${selectedRecord.id}`}>
-                  <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <Edit size={16} />
-                    <span>{t.editRecord}</span>
+              <div className="bg-gray-50 px-5 py-4 flex gap-3">
+                <Link to={`/daily-records/${selectedRecord.id}`} className="flex-1">
+                  <button className="w-full px-4 py-2.5 bg-green-600 text-white rounded-xl font-medium">
+                    {t.editRecord}
                   </button>
                 </Link>
                 <button
                   onClick={() => setShowDetailsModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl font-medium"
                 >
                   {t.close}
                 </button>
@@ -1011,35 +806,26 @@ const DailyRecords = () => {
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowDeleteModal(false)}></div>
           
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full max-w-md">
-              <div className="p-6">
-                <div className="flex items-center justify-center mb-4">
-                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                    <AlertCircle size={32} className="text-red-600" />
-                  </div>
+            <div className="relative transform overflow-hidden rounded-2xl bg-white w-full max-w-sm shadow-2xl">
+              <div className="p-5 text-center">
+                <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <AlertCircle size={28} className="text-red-600" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 text-center mb-2">{t.deleteRecord}</h3>
-                <p className="text-gray-600 text-center mb-6">
-                  {t.deleteConfirmation} <span className="font-semibold">{formatDate(selectedRecord.date)}</span>? {t.deleteWarning}
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{t.deleteRecord}</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  {t.deleteConfirmation} {formatDate(selectedRecord.date)}? {t.deleteWarning}
                 </p>
-                <div className="flex space-x-3" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+                <div className="flex gap-3">
                   <button
                     onClick={confirmDelete}
                     disabled={deleteLoading}
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center"
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-medium disabled:opacity-50"
                   >
-                    {deleteLoading ? (
-                      <>
-                        <RefreshCw size={14} className="animate-spin mr-2" />
-                        {t.deleting}
-                      </>
-                    ) : (
-                      t.delete
-                    )}
+                    {deleteLoading ? t.deleting : t.delete}
                   </button>
                   <button
                     onClick={() => setShowDeleteModal(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl font-medium"
                   >
                     {t.cancel}
                   </button>
@@ -1049,6 +835,16 @@ const DailyRecords = () => {
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

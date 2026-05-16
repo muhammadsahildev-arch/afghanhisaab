@@ -12,7 +12,9 @@ import {
   Calendar,
   DollarSign,
   Edit,
-  AlertCircle
+  AlertCircle,
+  Calculator,
+  Delete
 } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -28,27 +30,22 @@ const DailyRecordsUpdate = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   
-  // Get state from Redux
   const { record, loading: fetchLoading, error: fetchError } = useSelector((state) => state.dailyRecordDetails);
   const { loading: updateLoading, success: updateSuccess, error: updateError } = useSelector((state) => state.updateDailyRecord);
   
-  // Language translations
   const translations = {
     en: {
-      backToDailyRecords: "Back to Daily Records",
-      updateDailyRecord: "Update Daily Record",
-      editIncomeSpendEntries: "Edit income and spend entries for this record",
-      recordUpdated: "Daily record updated successfully!",
-      redirecting: "Redirecting to daily records...",
+      back: "Back",
+      updateRecord: "Update Record",
+      recordUpdated: "Record updated successfully!",
+      redirecting: "Redirecting...",
       errorUpdating: "Error updating record",
       loadingData: "Loading record data...",
-      recordDate: "Record Date",
-      editingRecord: "Editing Record",
-      incomeEntries: "Income Entries",
-      spendEntries: "Spend Entries",
-      addIncome: "Add Income",
-      addSpend: "Add Spend",
-      description: "Description",
+      date: "Date",
+      selectType: "Select Type",
+      income: "Income",
+      spend: "Spend",
+      description: "Description (Optional)",
       amount: "Amount",
       currency: "Currency",
       personName: "Person Name",
@@ -57,106 +54,109 @@ const DailyRecordsUpdate = () => {
       netBalance: "Net Balance",
       cancel: "Cancel",
       updating: "Updating...",
-      updateRecord: "Update Record",
+      update: "Update",
       required: "*",
-      incomeDescriptionPlaceholder: "Income description",
-      spendDescriptionPlaceholder: "Spend description",
+      descriptionPlaceholder: "Enter description (optional)",
       personNamePlaceholder: "Person name",
-      recordId: "ID",
       errors: {
-        descriptionRequired: "Description is required",
         amountRequired: "Amount is required",
-        amountPositive: "Amount must be a positive number",
+        amountPositive: "Amount must be positive",
         personNameRequired: "Person name is required"
-      }
+      },
+      calculator: {
+        title: "Calculator",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      },
+      editType: "Edit"
     },
     ur: {
-      backToDailyRecords: "روزانہ ریکارڈز پر واپس جائیں",
-      updateDailyRecord: "روزانہ ریکارڈ اپ ڈیٹ کریں",
-      editIncomeSpendEntries: "اس ریکارڈ کے لیے آمدنی اور اخراجات کی انٹریز میں ترمیم کریں",
-      recordUpdated: "روزانہ ریکارڈ کامیابی سے اپ ڈیٹ ہو گیا!",
-      redirecting: "روزانہ ریکارڈز پر جا رہے ہیں...",
+      back: "واپس",
+      updateRecord: "ریکارڈ اپ ڈیٹ کریں",
+      recordUpdated: "ریکارڈ کامیابی سے اپ ڈیٹ ہو گیا!",
+      redirecting: "جا رہے ہیں...",
       errorUpdating: "ریکارڈ اپ ڈیٹ کرنے میں خرابی",
       loadingData: "ریکارڈ ڈیٹا لوڈ ہو رہا ہے...",
-      recordDate: "ریکارڈ کی تاریخ",
-      editingRecord: "ریکارڈ میں ترمیم کر رہے ہیں",
-      incomeEntries: "آمدنی کی انٹریز",
-      spendEntries: "اخراجات کی انٹریز",
-      addIncome: "آمدنی شامل کریں",
-      addSpend: "اخراجات شامل کریں",
-      description: "تفصیل",
+      date: "تاریخ",
+      selectType: "قسیم منتخب کریں",
+      income: "آمدنی",
+      spend: "اخراجات",
+      description: "تفصیل (اختیاری)",
       amount: "رقم",
       currency: "کرنسی",
       personName: "شخص کا نام",
       totalIncome: "کل آمدنی",
       totalSpend: "کل اخراجات",
       netBalance: "خالص بیلنس",
-      cancel: "منسوخ کریں",
+      cancel: "منسوخ",
       updating: "اپ ڈیٹ ہو رہا ہے...",
-      updateRecord: "ریکارڈ اپ ڈیٹ کریں",
+      update: "اپ ڈیٹ",
       required: "*",
-      incomeDescriptionPlaceholder: "آمدنی کی تفصیل",
-      spendDescriptionPlaceholder: "اخراجات کی تفصیل",
+      descriptionPlaceholder: "تفصیل درج کریں (اختیاری)",
       personNamePlaceholder: "شخص کا نام",
-      recordId: "شناختی نمبر",
       errors: {
-        descriptionRequired: "تفصیل درکار ہے",
         amountRequired: "رقم درکار ہے",
         amountPositive: "رقم صفر سے زیادہ ہونی چاہیے",
         personNameRequired: "شخص کا نام درکار ہے"
-      }
+      },
+      calculator: {
+        title: "کیلکولیٹر",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      },
+      editType: "ترمیم"
     },
     ps: {
-      backToDailyRecords: "بیرته ورځني ریکارډونو ته",
-      updateDailyRecord: "ورځنی ریکارډ تازه کړئ",
-      editIncomeSpendEntries: "د دې ریکارډ لپاره د عاید او لګښت ننوتنې سم کړئ",
-      recordUpdated: "ورځنی ریکارډ په بریالیتوب سره تازه شو!",
-      redirecting: "ورځني ریکارډونو ته لیږدول کیږي...",
+      back: "بیرته",
+      updateRecord: "ریکارډ تازه کړئ",
+      recordUpdated: "ریکارډ په بریالیتوب سره تازه شو!",
+      redirecting: "لیږدول کیږي...",
       errorUpdating: "د ریکارډ تازه کولو کې تېروتنه",
       loadingData: "د ریکارډ معلومات بار کیږي...",
-      recordDate: "د ریکارډ نیټه",
-      editingRecord: "ریکارډ سمول",
-      incomeEntries: "د عاید ننوتنې",
-      spendEntries: "د لګښت ننوتنې",
-      addIncome: "عاید اضافه کړئ",
-      addSpend: "لګښت اضافه کړئ",
-      description: "تشریح",
+      date: "نیټه",
+      selectType: "ډول وټاکئ",
+      income: "عاید",
+      spend: "لګښت",
+      description: "تشریح (اختیاري)",
       amount: "اندازه",
       currency: "اسعار",
       personName: "د شخص نوم",
       totalIncome: "ټول عاید",
       totalSpend: "ټول لګښت",
       netBalance: "خالص بیلانس",
-      cancel: "لغوه کړئ",
+      cancel: "لغوه",
       updating: "تازه کیږي...",
-      updateRecord: "ریکارډ تازه کړئ",
+      update: "تازه کړئ",
       required: "*",
-      incomeDescriptionPlaceholder: "د عاید تشریح",
-      spendDescriptionPlaceholder: "د لګښت تشریح",
+      descriptionPlaceholder: "تشریح دننه کړئ (اختیاري)",
       personNamePlaceholder: "د شخص نوم",
-      recordId: "شناختي نمبر",
       errors: {
-        descriptionRequired: "تشریح اړینه ده",
         amountRequired: "اندازه اړینه ده",
         amountPositive: "اندازه باید له صفر څخه زیاته وي",
         personNameRequired: "د شخص نوم اړین دی"
-      }
+      },
+      calculator: {
+        title: "حسابګر",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      },
+      editType: "سمول"
     },
     fa: {
-      backToDailyRecords: "بازگشت به رکوردهای روزانه",
-      updateDailyRecord: "به روز رسانی رکورد روزانه",
-      editIncomeSpendEntries: "ویرایش ورودی‌های درآمد و هزینه برای این رکورد",
-      recordUpdated: "رکورد روزانه با موفقیت به روز شد!",
-      redirecting: "در حال انتقال به رکوردهای روزانه...",
+      back: "بازگشت",
+      updateRecord: "به روز رسانی رکورد",
+      recordUpdated: "رکورد با موفقیت به روز شد!",
+      redirecting: "در حال انتقال...",
       errorUpdating: "خطا در به روز رسانی رکورد",
       loadingData: "در حال بارگذاری اطلاعات رکورد...",
-      recordDate: "تاریخ رکورد",
-      editingRecord: "در حال ویرایش رکورد",
-      incomeEntries: "ورودی‌های درآمد",
-      spendEntries: "ورودی‌های هزینه",
-      addIncome: "افزودن درآمد",
-      addSpend: "افزودن هزینه",
-      description: "توضیحات",
+      date: "تاریخ",
+      selectType: "انتخاب نوع",
+      income: "درآمد",
+      spend: "هزینه",
+      description: "توضیحات (اختیاری)",
       amount: "مبلغ",
       currency: "ارز",
       personName: "نام شخص",
@@ -165,24 +165,32 @@ const DailyRecordsUpdate = () => {
       netBalance: "موجودی خالص",
       cancel: "انصراف",
       updating: "در حال به روز رسانی...",
-      updateRecord: "به روز رسانی رکورد",
+      update: "به روز رسانی",
       required: "*",
-      incomeDescriptionPlaceholder: "توضیحات درآمد",
-      spendDescriptionPlaceholder: "توضیحات هزینه",
+      descriptionPlaceholder: "توضیحات را وارد کنید (اختیاری)",
       personNamePlaceholder: "نام شخص",
-      recordId: "شناسه",
       errors: {
-        descriptionRequired: "توضیحات الزامی است",
         amountRequired: "مبلغ الزامی است",
         amountPositive: "مبلغ باید بیشتر از صفر باشد",
         personNameRequired: "نام شخص الزامی است"
-      }
+      },
+      calculator: {
+        title: "ماشین حساب",
+        clear: "C",
+        backspace: "⌫",
+        calculate: "="
+      },
+      editType: "ویرایش"
     }
   };
 
-  // Get language from localStorage
   const [currentLang, setCurrentLang] = useState('en');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showTypeModal, setShowTypeModal] = useState(true);
+  const [selectedType, setSelectedType] = useState(null);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorInput, setCalculatorInput] = useState('');
+  const [calculatorExpression, setCalculatorExpression] = useState('');
 
   useEffect(() => {
     const savedLang = localStorage.getItem('appLanguage');
@@ -200,7 +208,6 @@ const DailyRecordsUpdate = () => {
   const [recordDate, setRecordDate] = useState('');
   const [errors, setErrors] = useState({});
   
-  // Currencies for dropdown
   const currencies = [
     { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸' },
     { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺' },
@@ -209,72 +216,50 @@ const DailyRecordsUpdate = () => {
     { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ', flag: '🇦🇪' },
     { code: 'SAR', name: 'Saudi Riyal', symbol: 'ر.س', flag: '🇸🇦' },
     { code: 'AFN', name: 'Afghan Afghani', symbol: '؋', flag: '🇦🇫' },
-    { code: 'INR', name: 'Indian Rupee', symbol: '₹', flag: '🇮🇳' },
-    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', flag: '🇨🇦' },
-    { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', flag: '🇦🇺' }
+    { code: 'INR', name: 'Indian Rupee', symbol: '₹', flag: '🇮🇳' }
   ];
 
-  // Income entries state
-  const [incomeEntries, setIncomeEntries] = useState([
-    {
-      id: 1,
-      description: '',
-      amount: '',
-      currency: 'USD',
-      personName: ''
-    }
+  const [entries, setEntries] = useState([
+    { id: 1, description: '', amount: '', currency: 'USD', personName: '' }
   ]);
 
-  // Spend entries state
-  const [spendEntries, setSpendEntries] = useState([
-    {
-      id: 1,
-      description: '',
-      amount: '',
-      currency: 'USD',
-      personName: ''
-    }
-  ]);
-
-  // Fetch existing record data
   useEffect(() => {
     if (id) {
       dispatch(getDailyRecordDetailsAction(id));
     }
   }, [dispatch, id]);
 
-  // Populate form with fetched data
   useEffect(() => {
     if (record && Object.keys(record).length > 0) {
       setRecordDate(record.date?.split('T')[0] || '');
       
-      // Set income entries
+      // Determine which type has entries
       if (record.incomeEntries && record.incomeEntries.length > 0) {
-        setIncomeEntries(record.incomeEntries.map((entry, idx) => ({
+        setSelectedType('income');
+        setEntries(record.incomeEntries.map((entry, idx) => ({
           id: idx + 1,
           description: entry.description || '',
           amount: entry.amount?.toString() || '',
           currency: entry.currency || 'USD',
           personName: entry.personName || ''
         })));
-      }
-      
-      // Set spend entries
-      if (record.spendEntries && record.spendEntries.length > 0) {
-        setSpendEntries(record.spendEntries.map((entry, idx) => ({
+        setShowTypeModal(false);
+      } else if (record.spendEntries && record.spendEntries.length > 0) {
+        setSelectedType('spend');
+        setEntries(record.spendEntries.map((entry, idx) => ({
           id: idx + 1,
           description: entry.description || '',
           amount: entry.amount?.toString() || '',
           currency: entry.currency || 'USD',
           personName: entry.personName || ''
         })));
+        setShowTypeModal(false);
       }
       
       setIsFetching(false);
     }
   }, [record]);
 
-  // Handle fetch errors
   useEffect(() => {
     if (fetchError) {
       toast.error(fetchError);
@@ -283,21 +268,17 @@ const DailyRecordsUpdate = () => {
     }
   }, [fetchError, dispatch]);
 
-  // Handle update success
   useEffect(() => {
     if (updateSuccess) {
       setSaveSuccess(true);
       toast.success(t.recordUpdated);
       dispatch({ type: UPDATE_DAILY_RECORD_RESET });
-      
-      // Redirect after 2 seconds
       setTimeout(() => {
         navigate('/daily-records');
       }, 2000);
     }
   }, [updateSuccess, dispatch, navigate, t]);
 
-  // Handle update errors
   useEffect(() => {
     if (updateError) {
       toast.error(updateError);
@@ -305,34 +286,20 @@ const DailyRecordsUpdate = () => {
     }
   }, [updateError, dispatch]);
 
-  // Clean up on unmount
   useEffect(() => {
     return () => {
       dispatch({ type: UPDATE_DAILY_RECORD_RESET });
     };
   }, [dispatch]);
 
-  // Get currency symbol
   const getCurrencySymbol = (currencyCode) => {
     const currency = currencies.find(c => c.code === currencyCode);
     return currency ? currency.symbol : '$';
   };
 
-  // Format amount with currency symbol
-  const formatAmount = (amount, currency) => {
-    if (!amount && amount !== 0) return 'N/A';
-    const symbol = getCurrencySymbol(currency);
-    const formattedAmount = amount.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-    return `${symbol} ${formattedAmount}`;
-  };
-
-  // Calculate totals by currency for income
-  const getIncomeTotalsByCurrency = () => {
+  const getTotalsByCurrency = () => {
     const totals = {};
-    incomeEntries.forEach(entry => {
+    entries.forEach(entry => {
       if (entry.amount && entry.currency) {
         const amount = parseFloat(entry.amount) || 0;
         if (!totals[entry.currency]) {
@@ -344,143 +311,77 @@ const DailyRecordsUpdate = () => {
     return totals;
   };
 
-  // Calculate totals by currency for spend
-  const getSpendTotalsByCurrency = () => {
-    const totals = {};
-    spendEntries.forEach(entry => {
-      if (entry.amount && entry.currency) {
-        const amount = parseFloat(entry.amount) || 0;
-        if (!totals[entry.currency]) {
-          totals[entry.currency] = 0;
-        }
-        totals[entry.currency] += amount;
-      }
-    });
-    return totals;
+  const totalsByCurrency = getTotalsByCurrency();
+
+  const addEntry = () => {
+    const newId = entries.length + 1;
+    setEntries([...entries, { id: newId, description: '', amount: '', currency: 'USD', personName: '' }]);
   };
 
-  // Calculate net balance by currency
-  const getNetBalanceByCurrency = () => {
-    const incomeTotals = getIncomeTotalsByCurrency();
-    const spendTotals = getSpendTotalsByCurrency();
-    const allCurrencies = new Set([...Object.keys(incomeTotals), ...Object.keys(spendTotals)]);
-    
-    const netBalances = {};
-    allCurrencies.forEach(currency => {
-      const income = incomeTotals[currency] || 0;
-      const spend = spendTotals[currency] || 0;
-      netBalances[currency] = income - spend;
-    });
-    
-    return netBalances;
-  };
-
-  // Calculate totals for display
-  const totalIncome = incomeEntries.reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
-  const totalSpend = spendEntries.reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
-  const netBalance = totalIncome - totalSpend;
-
-  const incomeTotalsByCurrency = getIncomeTotalsByCurrency();
-  const spendTotalsByCurrency = getSpendTotalsByCurrency();
-  const netBalanceByCurrency = getNetBalanceByCurrency();
-
-  // Add new income entry
-  const addIncomeEntry = () => {
-    const newId = incomeEntries.length + 1;
-    setIncomeEntries([
-      ...incomeEntries,
-      {
-        id: newId,
-        description: '',
-        amount: '',
-        currency: 'USD',
-        personName: ''
-      }
-    ]);
-  };
-
-  // Remove income entry
-  const removeIncomeEntry = (id) => {
-    if (incomeEntries.length > 1) {
-      setIncomeEntries(incomeEntries.filter(entry => entry.id !== id));
+  const removeEntry = (id) => {
+    if (entries.length > 1) {
+      setEntries(entries.filter(entry => entry.id !== id));
     }
   };
 
-  // Update income entry
-  const updateIncomeEntry = (id, field, value) => {
-    setIncomeEntries(incomeEntries.map(entry => 
+  const updateEntry = (id, field, value) => {
+    setEntries(entries.map(entry => 
       entry.id === id ? { ...entry, [field]: value } : entry
     ));
-  };
-
-  // Add new spend entry
-  const addSpendEntry = () => {
-    const newId = spendEntries.length + 1;
-    setSpendEntries([
-      ...spendEntries,
-      {
-        id: newId,
-        description: '',
-        amount: '',
-        currency: 'USD',
-        personName: ''
-      }
-    ]);
-  };
-
-  // Remove spend entry
-  const removeSpendEntry = (id) => {
-    if (spendEntries.length > 1) {
-      setSpendEntries(spendEntries.filter(entry => entry.id !== id));
+    if (errors[`${field}_${id}`]) {
+      const newErrors = { ...errors };
+      delete newErrors[`${field}_${id}`];
+      setErrors(newErrors);
     }
   };
 
-  // Update spend entry
-  const updateSpendEntry = (id, field, value) => {
-    setSpendEntries(spendEntries.map(entry => 
-      entry.id === id ? { ...entry, [field]: value } : entry
-    ));
+  const evaluateExpression = (expr) => {
+    try {
+      let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
+      const result = Function('return (' + expression + ')')();
+      return result;
+    } catch (e) {
+      return null;
+    }
   };
 
-  // Validate form
+  const handleCalculatorButton = (value) => {
+    if (value === 'C') {
+      setCalculatorInput('');
+      setCalculatorExpression('');
+    } else if (value === '⌫') {
+      setCalculatorInput(prev => prev.slice(0, -1));
+      setCalculatorExpression(prev => prev.slice(0, -1));
+    } else if (value === '=') {
+      const result = evaluateExpression(calculatorExpression || calculatorInput);
+      if (result !== null && !isNaN(result)) {
+        const rounded = Math.round(result * 100) / 100;
+        setCalculatorInput(rounded.toString());
+        setCalculatorExpression(rounded.toString());
+        const firstEntry = entries[0];
+        updateEntry(firstEntry.id, 'amount', rounded.toString());
+        setShowCalculator(false);
+      }
+    } else {
+      setCalculatorInput(prev => prev + value);
+      setCalculatorExpression(prev => prev + value);
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
     let hasError = false;
 
-    // Validate income entries
-    incomeEntries.forEach((entry) => {
-      if (!entry.description) {
-        newErrors[`income_desc_${entry.id}`] = t.errors.descriptionRequired;
-        hasError = true;
-      }
+    entries.forEach((entry) => {
       if (!entry.amount) {
-        newErrors[`income_amount_${entry.id}`] = t.errors.amountRequired;
+        newErrors[`amount_${entry.id}`] = t.errors.amountRequired;
         hasError = true;
       } else if (isNaN(entry.amount) || parseFloat(entry.amount) <= 0) {
-        newErrors[`income_amount_${entry.id}`] = t.errors.amountPositive;
+        newErrors[`amount_${entry.id}`] = t.errors.amountPositive;
         hasError = true;
       }
       if (!entry.personName) {
-        newErrors[`income_person_${entry.id}`] = t.errors.personNameRequired;
-        hasError = true;
-      }
-    });
-
-    // Validate spend entries
-    spendEntries.forEach((entry) => {
-      if (!entry.description) {
-        newErrors[`spend_desc_${entry.id}`] = t.errors.descriptionRequired;
-        hasError = true;
-      }
-      if (!entry.amount) {
-        newErrors[`spend_amount_${entry.id}`] = t.errors.amountRequired;
-        hasError = true;
-      } else if (isNaN(entry.amount) || parseFloat(entry.amount) <= 0) {
-        newErrors[`spend_amount_${entry.id}`] = t.errors.amountPositive;
-        hasError = true;
-      }
-      if (!entry.personName) {
-        newErrors[`spend_person_${entry.id}`] = t.errors.personNameRequired;
+        newErrors[`personName_${entry.id}`] = t.errors.personNameRequired;
         hasError = true;
       }
     });
@@ -488,487 +389,443 @@ const DailyRecordsUpdate = () => {
     return { newErrors, hasError };
   };
 
-  // Handle form submit
   const handleSubmit = (e) => {
     e.preventDefault();
     const { newErrors, hasError } = validateForm();
     
     if (!hasError) {
-      // Prepare data for API
       const formData = {
         date: recordDate,
-        incomeEntries: incomeEntries.map(entry => ({
-          description: entry.description,
+        [selectedType === 'income' ? 'incomeEntries' : 'spendEntries']: entries.map(entry => ({
+          description: entry.description || '',
           amount: parseFloat(entry.amount),
           currency: entry.currency,
           personName: entry.personName
         })),
-        spendEntries: spendEntries.map(entry => ({
-          description: entry.description,
-          amount: parseFloat(entry.amount),
-          currency: entry.currency,
-          personName: entry.personName
-        }))
+        [selectedType === 'income' ? 'spendEntries' : 'incomeEntries']: []
       };
       
-      // Dispatch update action
       dispatch(updateDailyRecordAction(id, formData));
     } else {
       setErrors(newErrors);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  // Format date for display
-  const formatDate = (date) => {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'ur-PK', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+  const handleTypeSelect = (type) => {
+    setSelectedType(type);
+    setShowTypeModal(false);
+  };
+
+  const CalculatorButton = ({ children, onClick, variant = 'number' }) => {
+    const getBgColor = () => {
+      if (variant === 'operator') {
+        return selectedType === 'income' ? 'bg-green-100 text-green-600 active:bg-green-200' : 'bg-red-100 text-red-600 active:bg-red-200';
+      }
+      if (variant === 'clear') {
+        return 'bg-gray-200 text-gray-700 active:bg-gray-300';
+      }
+      return 'bg-gray-100 text-gray-700 active:bg-gray-200';
+    };
+
+    return (
+      <button
+        onClick={onClick}
+        className={`p-4 text-xl font-medium rounded-xl transition-colors ${getBgColor()}`}
+      >
+        {children}
+      </button>
+    );
   };
 
   if (!isInitialized || isFetching || fetchLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600">{t.loadingData}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">{t.loadingData}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Main Content - Full width */}
-      <main className="p-4 lg:p-8">
-        {/* Header */}
-        <div className="mb-6">
-          <Link
-            to="/daily-records"
-            className="inline-flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors mb-4"
-            style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
-          >
-            <ArrowLeft size={18} />
-            <span>{t.backToDailyRecords}</span>
-          </Link>
-          
-          <div className="flex items-center space-x-3" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-              {t.updateDailyRecord}
-            </h1>
-            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-              {t.recordId}: #{id}
-            </span>
+    <div className="min-h-screen bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Type Selection Modal */}
+      {showTypeModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-slideUp">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">{t.selectType}</h2>
+              <p className="text-center text-gray-500 text-sm mb-6">Choose what you want to edit</p>
+              
+              <div className="space-y-4">
+                {(record?.incomeEntries?.length > 0 || !record) && (
+                  <button
+                    onClick={() => handleTypeSelect('income')}
+                    className="w-full p-5 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-between hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <DollarSign size={24} className="text-white" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-white font-bold text-lg">{t.income}</p>
+                        <p className="text-white/70 text-sm">Edit income entries</p>
+                      </div>
+                    </div>
+                    <ArrowLeft size={20} className="text-white/70" style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} />
+                  </button>
+                )}
+
+                {(record?.spendEntries?.length > 0 || !record) && (
+                  <button
+                    onClick={() => handleTypeSelect('spend')}
+                    className="w-full p-5 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-between hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <Calculator size={24} className="text-white" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-white font-bold text-lg">{t.spend}</p>
+                        <p className="text-white/70 text-sm">Edit spend entries</p>
+                      </div>
+                    </div>
+                    <ArrowLeft size={20} className="text-white/70" style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} />
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-          <p className="text-gray-600 mt-1">{t.editIncomeSpendEntries}</p>
         </div>
+      )}
 
-        {/* Success Message */}
-        {saveSuccess && (
-          <div className="mb-6 p-4 bg-green-100 border border-green-300 rounded-xl flex items-center space-x-3 animate-fadeIn" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <div>
-              <p className="text-green-700 font-medium">{t.recordUpdated}</p>
-              <p className="text-sm text-green-600">{t.redirecting}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Error Message */}
-        {updateError && !saveSuccess && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-300 rounded-xl flex items-center space-x-3" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <div>
-              <p className="text-red-700 font-medium">{t.errorUpdating}</p>
-              <p className="text-sm text-red-600">{updateError}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Main Form */}
-        <div className="bg-white rounded-3xl shadow-2xl p-6 lg:p-8 border border-gray-200">
-          <form onSubmit={handleSubmit}>
-            {/* Date Display */}
-            <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
-              <div className="flex items-center justify-between" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <div className="flex items-center space-x-2 text-gray-700" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <Calendar size={18} className="text-green-600" />
-                  <span className="font-medium">{t.recordDate}:</span>
-                  <input
-                    type="date"
-                    value={recordDate}
-                    onChange={(e) => setRecordDate(e.target.value)}
-                    className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500"
-                  />
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-gray-500" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <Edit size={14} />
-                  <span>{t.editingRecord} #{id}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Income Section */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <DollarSign className="w-5 h-5 mr-2 text-green-600" />
-                  {t.incomeEntries}
-                </h2>
-                <button
-                  type="button"
-                  onClick={addIncomeEntry}
-                  className="bg-green-100 text-green-600 px-4 py-2 rounded-xl hover:bg-green-200 transition-colors flex items-center space-x-2"
-                  style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
-                >
-                  <Plus size={16} />
-                  <span>{t.addIncome}</span>
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {incomeEntries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="bg-green-50 p-4 rounded-xl border border-green-200 relative"
-                  >
-                    {incomeEntries.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeIncomeEntry(entry.id)}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      {/* Description */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.description} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <div className="relative">
-                          <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                          <input
-                            type="text"
-                            value={entry.description}
-                            onChange={(e) => updateIncomeEntry(entry.id, 'description', e.target.value)}
-                            className={`w-full pl-10 pr-3 py-2 border ${
-                              errors[`income_desc_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                            } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                            placeholder={t.incomeDescriptionPlaceholder}
-                          />
-                        </div>
-                        {errors[`income_desc_${entry.id}`] && (
-                          <p className="mt-1 text-xs text-red-600">{errors[`income_desc_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Amount */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.amount} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={entry.amount}
-                          onChange={(e) => updateIncomeEntry(entry.id, 'amount', e.target.value)}
-                          className={`w-full px-3 py-2 border ${
-                            errors[`income_amount_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                          } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                          placeholder="0.00"
-                          step="0.01"
-                        />
-                        {errors[`income_amount_${entry.id}`] && (
-                          <p className="mt-1 text-xs text-red-600">{errors[`income_amount_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Currency */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.currency} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <select
-                          value={entry.currency}
-                          onChange={(e) => updateIncomeEntry(entry.id, 'currency', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-                        >
-                          {currencies.map(currency => (
-                            <option key={currency.code} value={currency.code}>
-                              {currency.flag} {currency.code} - {currency.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Person Name */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.personName} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                          <input
-                            type="text"
-                            value={entry.personName}
-                            onChange={(e) => updateIncomeEntry(entry.id, 'personName', e.target.value)}
-                            className={`w-full pl-10 pr-3 py-2 border ${
-                              errors[`income_person_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                            } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                            placeholder={t.personNamePlaceholder}
-                          />
-                        </div>
-                        {errors[`income_person_${entry.id}`] && (
-                          <p className="mt-1 text-xs text-red-600">{errors[`income_person_${entry.id}`]}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Income Total - Show per currency */}
-              <div className="mt-4 p-3 bg-green-100 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-green-800">{t.totalIncome}:</span>
-                </div>
-                {Object.keys(incomeTotalsByCurrency).length > 0 ? (
-                  <div className="space-y-1">
-                    {Object.entries(incomeTotalsByCurrency).map(([currency, amount]) => (
-                      <div key={currency} className="flex justify-between items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                        <span className="text-sm text-green-700">{currency}:</span>
-                        <span className="font-bold text-green-800">
-                          {formatAmount(amount, currency)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex justify-between items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <span className="text-sm text-green-700">USD:</span>
-                    <span className="font-bold text-green-800">$ 0.00</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Spend Section */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <DollarSign className="w-5 h-5 mr-2 text-red-600" />
-                  {t.spendEntries}
-                </h2>
-                <button
-                  type="button"
-                  onClick={addSpendEntry}
-                  className="bg-red-100 text-red-600 px-4 py-2 rounded-xl hover:bg-red-200 transition-colors flex items-center space-x-2"
-                  style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
-                >
-                  <Plus size={16} />
-                  <span>{t.addSpend}</span>
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {spendEntries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="bg-red-50 p-4 rounded-xl border border-red-200 relative"
-                  >
-                    {spendEntries.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeSpendEntry(entry.id)}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                      {/* Description */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.description} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <div className="relative">
-                          <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                          <input
-                            type="text"
-                            value={entry.description}
-                            onChange={(e) => updateSpendEntry(entry.id, 'description', e.target.value)}
-                            className={`w-full pl-10 pr-3 py-2 border ${
-                              errors[`spend_desc_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                            } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                            placeholder={t.spendDescriptionPlaceholder}
-                          />
-                        </div>
-                        {errors[`spend_desc_${entry.id}`] && (
-                          <p className="mt-1 text-xs text-red-600">{errors[`spend_desc_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Amount */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.amount} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={entry.amount}
-                          onChange={(e) => updateSpendEntry(entry.id, 'amount', e.target.value)}
-                          className={`w-full px-3 py-2 border ${
-                            errors[`spend_amount_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                          } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                          placeholder="0.00"
-                          step="0.01"
-                        />
-                        {errors[`spend_amount_${entry.id}`] && (
-                          <p className="mt-1 text-xs text-red-600">{errors[`spend_amount_${entry.id}`]}</p>
-                        )}
-                      </div>
-
-                      {/* Currency */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.currency} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <select
-                          value={entry.currency}
-                          onChange={(e) => updateSpendEntry(entry.id, 'currency', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-                        >
-                          {currencies.map(currency => (
-                            <option key={currency.code} value={currency.code}>
-                              {currency.flag} {currency.code} - {currency.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Person Name */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {t.personName} <span className="text-red-500">{t.required}</span>
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                          <input
-                            type="text"
-                            value={entry.personName}
-                            onChange={(e) => updateSpendEntry(entry.id, 'personName', e.target.value)}
-                            className={`w-full pl-10 pr-3 py-2 border ${
-                              errors[`spend_person_${entry.id}`] ? 'border-red-500' : 'border-gray-300'
-                            } rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20`}
-                            placeholder={t.personNamePlaceholder}
-                          />
-                        </div>
-                        {errors[`spend_person_${entry.id}`] && (
-                          <p className="mt-1 text-xs text-red-600">{errors[`spend_person_${entry.id}`]}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Spend Total - Show per currency */}
-              <div className="mt-4 p-3 bg-red-100 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-red-800">{t.totalSpend}:</span>
-                </div>
-                {Object.keys(spendTotalsByCurrency).length > 0 ? (
-                  <div className="space-y-1">
-                    {Object.entries(spendTotalsByCurrency).map(([currency, amount]) => (
-                      <div key={currency} className="flex justify-between items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                        <span className="text-sm text-red-700">{currency}:</span>
-                        <span className="font-bold text-red-800">
-                          {formatAmount(amount, currency)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex justify-between items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                    <span className="text-sm text-red-700">USD:</span>
-                    <span className="font-bold text-red-800">$ 0.00</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Net Balance - Show per currency */}
-            <div className={`mb-8 p-4 rounded-xl ${
-              Object.values(netBalanceByCurrency).some(balance => balance >= 0) ? 'bg-green-100' : 'bg-red-100'
-            }`}>
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-gray-800">{t.netBalance}:</span>
-              </div>
-              {Object.keys(netBalanceByCurrency).length > 0 ? (
-                <div className="space-y-1">
-                  {Object.entries(netBalanceByCurrency).map(([currency, balance]) => (
-                    <div key={currency} className="flex justify-between items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                      <span className="text-sm text-gray-700">{currency}:</span>
-                      <span className={`text-lg font-bold ${
-                        balance >= 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {formatAmount(balance, currency)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex justify-between items-center" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-                  <span className="text-sm text-gray-700">USD:</span>
-                  <span className="text-lg font-bold text-green-600">$ 0.00</span>
-                </div>
-              )}
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <Link
-                to="/daily-records"
-                className="px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-medium"
-              >
-                {t.cancel}
-              </Link>
+      {/* Main Form */}
+      {!showTypeModal && selectedType && (
+        <>
+          {/* Header */}
+          <div className="bg-white shadow-sm sticky top-0 z-10">
+            <div className="px-4 py-3 flex items-center justify-between">
               <button
-                type="submit"
-                disabled={updateLoading}
-                className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 font-medium flex items-center space-x-2 disabled:opacity-50"
-                style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
+                onClick={() => navigate('/daily-records')}
+                className="p-2 -ml-2 active:bg-gray-100 rounded-full transition-colors"
               >
-                {updateLoading ? (
-                  <>
-                    <RefreshCw size={18} className="animate-spin" />
-                    <span>{t.updating}</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} />
-                    <span>{t.updateRecord}</span>
-                  </>
-                )}
+                <ArrowLeft size={24} className="text-gray-600" />
+              </button>
+              <h1 className="text-lg font-bold text-gray-800">
+                {t.editType} {selectedType === 'income' ? t.income : t.spend}
+              </h1>
+              <div className="w-10" />
+            </div>
+          </div>
+
+          <main className="p-4 pb-32">
+            {/* Success Message */}
+            {saveSuccess && (
+              <div className="mb-4 p-4 bg-green-100 border border-green-300 rounded-2xl flex items-center gap-3 animate-fadeIn">
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <div>
+                  <p className="text-green-700 font-medium">{t.recordUpdated}</p>
+                  <p className="text-sm text-green-600">{t.redirecting}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {updateError && !saveSuccess && (
+              <div className="mb-4 p-4 bg-red-100 border border-red-300 rounded-2xl flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <div>
+                  <p className="text-red-700 font-medium">{t.errorUpdating}</p>
+                  <p className="text-sm text-red-600">{updateError}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Date Picker */}
+            <div className="mb-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2">
+                <Calendar size={18} className="text-green-500" />
+                <span className="text-sm text-gray-500">{t.date}:</span>
+                <input
+                  type="date"
+                  value={recordDate}
+                  onChange={(e) => setRecordDate(e.target.value)}
+                  className="flex-1 px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:border-green-500 text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Entries List */}
+            <div className="space-y-3">
+              {entries.map((entry, index) => (
+                <div
+                  key={entry.id}
+                  className={`bg-white rounded-2xl shadow-sm border overflow-hidden ${
+                    selectedType === 'income' ? 'border-green-100' : 'border-red-100'
+                  }`}
+                >
+                  {/* Entry Header */}
+                  <div className={`px-4 py-2 flex items-center justify-between ${
+                    selectedType === 'income' ? 'bg-green-50' : 'bg-red-50'
+                  }`}>
+                    <span className={`text-sm font-semibold ${
+                      selectedType === 'income' ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                      Entry {index + 1}
+                    </span>
+                    {entries.length > 1 && (
+                      <button onClick={() => removeEntry(entry.id)} className="p-1">
+                        <X size={16} className="text-red-500" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="p-4 space-y-3">
+                    {/* Amount with Calculator */}
+                    <div>
+                      <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                        {t.amount} <span className="text-red-500 text-xs">{t.required}</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <div className="flex-1 relative">
+                          <input
+                            type="number"
+                            value={entry.amount}
+                            onChange={(e) => updateEntry(entry.id, 'amount', e.target.value)}
+                            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                              errors[`amount_${entry.id}`]
+                                ? 'border-red-500 focus:ring-red-500/20'
+                                : `border-gray-200 focus:ring-${selectedType === 'income' ? 'green' : 'red'}-500/20 focus:border-${selectedType === 'income' ? 'green' : 'red'}-500`
+                            }`}
+                            placeholder="0.00"
+                            step="0.01"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                            {getCurrencySymbol(entry.currency)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCalculatorInput(entry.amount);
+                            setCalculatorExpression(entry.amount);
+                            setShowCalculator(true);
+                          }}
+                          className={`px-4 py-3 rounded-xl flex items-center justify-center transition-all ${
+                            selectedType === 'income'
+                              ? 'bg-green-100 text-green-600 active:bg-green-200'
+                              : 'bg-red-100 text-red-600 active:bg-red-200'
+                          }`}
+                        >
+                          <Calculator size={20} />
+                        </button>
+                      </div>
+                      {errors[`amount_${entry.id}`] && (
+                        <p className="mt-1 text-xs text-red-500">{errors[`amount_${entry.id}`]}</p>
+                      )}
+                    </div>
+
+                    {/* Description (Optional) */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-1.5 block">{t.description}</label>
+                      <div className="relative">
+                        <FileText size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          value={entry.description}
+                          onChange={(e) => updateEntry(entry.id, 'description', e.target.value)}
+                          className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+                          placeholder={t.descriptionPlaceholder}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Currency */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-1.5 block">{t.currency}</label>
+                      <select
+                        value={entry.currency}
+                        onChange={(e) => updateEntry(entry.id, 'currency', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 appearance-none bg-white"
+                      >
+                        {currencies.map(currency => (
+                          <option key={currency.code} value={currency.code}>
+                            {currency.flag} {currency.code} - {currency.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Person Name */}
+                    <div>
+                      <label className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-1.5">
+                        {t.personName} <span className="text-red-500 text-xs">{t.required}</span>
+                      </label>
+                      <div className="relative">
+                        <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          value={entry.personName}
+                          onChange={(e) => updateEntry(entry.id, 'personName', e.target.value)}
+                          className={`w-full pl-10 pr-3 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                            errors[`personName_${entry.id}`]
+                              ? 'border-red-500 focus:ring-red-500/20'
+                              : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'
+                          }`}
+                          placeholder={t.personNamePlaceholder}
+                        />
+                      </div>
+                      {errors[`personName_${entry.id}`] && (
+                        <p className="mt-1 text-xs text-red-500">{errors[`personName_${entry.id}`]}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Add More Button */}
+            <button
+              type="button"
+              onClick={addEntry}
+              className={`w-full mt-3 py-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 transition-all ${
+                selectedType === 'income'
+                  ? 'border-green-300 text-green-600 active:bg-green-50'
+                  : 'border-red-300 text-red-600 active:bg-red-50'
+              }`}
+            >
+              <Plus size={18} />
+              <span className="text-sm font-medium">
+                Add Another {selectedType === 'income' ? 'Income' : 'Spend'}
+              </span>
+            </button>
+
+            {/* Summary Section */}
+            {Object.keys(totalsByCurrency).length > 0 && (
+              <div className={`mt-4 p-4 rounded-2xl ${
+                selectedType === 'income' ? 'bg-green-50' : 'bg-red-50'
+              }`}>
+                <span className="text-sm font-medium text-gray-600 mb-1 block">
+                  Total {selectedType === 'income' ? 'Income' : 'Spend'}
+                </span>
+                {Object.entries(totalsByCurrency).map(([currency, amount]) => (
+                  <p key={currency} className={`text-xl font-bold ${
+                    selectedType === 'income' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {getCurrencySymbol(currency)} {amount.toFixed(2)}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            <div className="h-4" />
+          </main>
+
+          {/* Fixed Update Button */}
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-lg z-20">
+            <button
+              onClick={handleSubmit}
+              disabled={updateLoading}
+              className={`w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
+                selectedType === 'income'
+                  ? 'bg-gradient-to-r from-green-500 to-green-600 active:from-green-600 active:to-green-700'
+                  : 'bg-gradient-to-r from-red-500 to-red-600 active:from-red-600 active:to-red-700'
+              } disabled:opacity-50`}
+            >
+              {updateLoading ? (
+                <>
+                  <RefreshCw size={18} className="animate-spin" />
+                  <span>{t.updating}</span>
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  <span>{t.update}</span>
+                </>
+              )}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Calculator Modal */}
+      {showCalculator && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end justify-center animate-fadeIn">
+          <div className="bg-white rounded-t-3xl w-full max-w-md animate-slideUp">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-800">{t.calculator.title}</h3>
+              <button onClick={() => setShowCalculator(false)} className="p-2 active:bg-gray-100 rounded-full">
+                <X size={20} className="text-gray-500" />
               </button>
             </div>
-          </form>
-        </div>
-      </main>
 
-      <style jsx>{`
+            <div className="p-4 bg-gray-50">
+              <div className="bg-white rounded-xl p-4 shadow-inner">
+                <p className="text-right text-gray-400 text-sm min-h-[20px]">{calculatorExpression}</p>
+                <p className="text-right text-3xl font-bold text-gray-800 mt-1">{calculatorInput || '0'}</p>
+              </div>
+            </div>
+
+            <div className="p-4">
+              <div className="grid grid-cols-4 gap-2">
+                <CalculatorButton onClick={() => handleCalculatorButton('7')}>7</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('8')}>8</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('9')}>9</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('÷')} variant="operator">÷</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('4')}>4</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('5')}>5</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('6')}>6</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('×')} variant="operator">×</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('1')}>1</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('2')}>2</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('3')}>3</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('-')} variant="operator">-</CalculatorButton>
+
+                <CalculatorButton onClick={() => handleCalculatorButton('0')}>0</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('.')}>.</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('C')} variant="clear">C</CalculatorButton>
+                <CalculatorButton onClick={() => handleCalculatorButton('+')} variant="operator">+</CalculatorButton>
+
+                <button
+                  onClick={() => handleCalculatorButton('⌫')}
+                  className="p-4 text-xl font-medium text-gray-700 bg-gray-100 rounded-xl active:bg-gray-200 transition-colors col-span-2 flex items-center justify-center gap-2"
+                >
+                  <Delete size={18} />
+                  <span>{t.calculator.backspace}</span>
+                </button>
+                <button
+                  onClick={() => handleCalculatorButton('=')}
+                  className={`p-4 text-xl font-bold rounded-xl transition-colors col-span-2 ${
+                    selectedType === 'income'
+                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white active:from-green-600 active:to-green-700'
+                      : 'bg-gradient-to-r from-red-500 to-red-600 text-white active:from-red-600 active:to-red-700'
+                  }`}
+                >
+                  {t.calculator.calculate}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.2s ease-out;
+        }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
         }
       `}</style>
     </div>

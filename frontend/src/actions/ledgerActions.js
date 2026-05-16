@@ -9,8 +9,8 @@ import {
   CLEAR_ERRORS
 } from "../constants/constants";
 
-//const BASE_URI = `http://localhost:5000/api`;
-const BASE_URI = `/api`;
+const BASE_URI = `http://localhost:5000/api`;
+//const BASE_URI = `/api`;
 
 // Get All Ledger Entries
 export const getAllLedgerEntriesAction = (page = 1, limit = 10, search = '', status = '') => async (dispatch) => {

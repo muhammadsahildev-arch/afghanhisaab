@@ -1,9 +1,9 @@
 const User = require('../models/User');
-const Role = require('../models/Role');
 const crypto = require('crypto');
 const asyncHandler = require('../middleware/asyncHandler');
 const generateToken = require('../utils/generateToken');
 const sendEmail = require('../utils/sendEmail');
+const Role = require('../models/Role');
 
 // Send token response
 const sendTokenResponse = (user, statusCode, res) => {
@@ -22,10 +22,8 @@ const sendTokenResponse = (user, statusCode, res) => {
 exports.register = asyncHandler(async (req, res) => {
   const {
     fullName, email, phone, password, agreeTerms,
-    dateOfBirth, gender, addressLine1, addressLine2, city, state,
-    postalCode, country, occupation, companyName, annualIncome,
-    purposeOfAccount, currencyPreference, newsletterSubscribed,
-    smsAlerts, agreeMarketing
+    city, state,
+     country, 
   } = req.body;
 
   // Check if user exists
@@ -50,22 +48,9 @@ exports.register = asyncHandler(async (req, res) => {
       phone
     },
     customerData: {
-      dateOfBirth,
-      gender,
-      addressLine1,
-      addressLine2,
       city,
       state,
-      postalCode,
       country,
-      occupation,
-      companyName,
-      annualIncome,
-      purposeOfAccount,
-      currencyPreference,
-      newsletterSubscribed,
-      smsAlerts,
-      agreeMarketing
     }
   });
 

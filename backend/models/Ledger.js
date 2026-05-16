@@ -4,7 +4,6 @@ const ledgerEntrySchema = new mongoose.Schema({
   // Basic Information
   description: {
     type: String,
-    required: [true, 'Description is required'],
     trim: true
   },
   name: {
@@ -26,22 +25,10 @@ const ledgerEntrySchema = new mongoose.Schema({
     default: 'USD'
   },
   
-  // Remaining Amount Information
+  // Remaining Amount Information (Optional)
   remainingAmount: {
     type: Number,
-    required: [true, 'Remaining amount is required'],
-    min: [0, 'Remaining amount must be positive']
-  },
-  remainingCurrency: {
-    type: String,
-    required: true,
-    enum: ['USD', 'EUR', 'GBP', 'PKR', 'AED', 'SAR', 'AFN'],
-    default: 'USD'
-  },
-  remainingPersonName: {
-    type: String,
-    required: [true, 'Remaining person name is required'],
-    trim: true
+    default: null
   },
   
   // Calculated Field
@@ -80,6 +67,10 @@ const ledgerEntrySchema = new mongoose.Schema({
 
 // Calculate balance before saving
 ledgerEntrySchema.pre('save', function(next) {
+  // If remainingAmount is not provided, set it to amount (meaning fully paid)
+  if (this.remainingAmount === null || this.remainingAmount === undefined) {
+    this.remainingAmount = this.amount;
+  }
   this.balance = this.amount - this.remainingAmount;
   next();
 });
@@ -90,7 +81,12 @@ ledgerEntrySchema.pre('findOneAndUpdate', async function(next) {
   if (update.amount !== undefined || update.remainingAmount !== undefined) {
     const doc = await this.model.findOne(this.getQuery());
     const amount = update.amount !== undefined ? update.amount : doc.amount;
-    const remainingAmount = update.remainingAmount !== undefined ? update.remainingAmount : doc.remainingAmount;
+    let remainingAmount = update.remainingAmount !== undefined ? update.remainingAmount : doc.remainingAmount;
+    
+    // If remainingAmount is null or undefined, set to amount
+    if (remainingAmount === null || remainingAmount === undefined) {
+      remainingAmount = amount;
+    }
     update.balance = amount - remainingAmount;
   }
   next();

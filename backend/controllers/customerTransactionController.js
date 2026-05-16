@@ -1,42 +1,20 @@
 const CustomerTransaction = require('../models/CustomerTransaction');
 const asyncHandler = require('../middleware/asyncHandler');
 
-// Helper function to format currency
-const formatCurrency = (amount, currency) => {
-  const symbols = {
-    USD: '$', EUR: '€', GBP: '£', PKR: '₨', AED: 'د.إ', SAR: 'ر.س', AFN: '؋'
-  };
-  return `${symbols[currency] || currency} ${amount.toLocaleString()}`;
-};
-
 // Helper function to format transaction for frontend
 const formatTransaction = (transaction) => {
   return {
     id: transaction._id,
     name: transaction.name,
-    senderEmail: transaction.senderEmail,
-    senderPhone: transaction.senderPhone,
+    senderName: transaction.senderName,
     senderCurrency: transaction.senderCurrency,
     senderAmount: transaction.senderAmount,
-    senderCountry: transaction.senderCountry,
-    senderState: transaction.senderState,
-    senderCity: transaction.senderCity,
-    senderAddress: transaction.senderAddress,
-    receiverEmail: transaction.receiverEmail,
-    receiverPhone: transaction.receiverPhone,
+    receiverName: transaction.receiverName,
     receiverCurrency: transaction.receiverCurrency,
     receiverAmount: transaction.receiverAmount,
-    receiverCountry: transaction.receiverCountry,
-    receiverState: transaction.receiverState,
-    receiverCity: transaction.receiverCity,
-    receiverAddress: transaction.receiverAddress,
-    commission: transaction.commission,
-    fee: transaction.fee,
-    tax: transaction.tax,
-    totalFees: transaction.totalFees,
     exchangeRate: transaction.exchangeRate,
+    description: transaction.description,
     status: transaction.status,
-    notes: transaction.notes,
     date: transaction.transactionDate,
     createdAt: transaction.createdAt,
     updatedAt: transaction.updatedAt
@@ -49,54 +27,26 @@ const formatTransaction = (transaction) => {
 exports.createTransaction = asyncHandler(async (req, res) => {
   const {
     name,
-    senderEmail,
-    senderPhone,
+    senderName,
     senderCurrency,
     senderAmount,
-    senderCountry,
-    senderState,
-    senderCity,
-    senderAddress,
-    receiverEmail,
-    receiverPhone,
+    receiverName,
     receiverCurrency,
-    receiverCountry,
-    receiverState,
-    receiverCity,
-    receiverAddress,
-    commission,
-    fee,
-    tax,
     exchangeRate,
-    status,
-    notes,
-    transactionDate
+    description
   } = req.body;
 
   const transaction = await CustomerTransaction.create({
     name,
-    senderEmail,
-    senderPhone,
+    senderName,
     senderCurrency,
     senderAmount: parseFloat(senderAmount),
-    senderCountry,
-    senderState,
-    senderCity,
-    senderAddress,
-    receiverEmail,
-    receiverPhone,
+    receiverName,
     receiverCurrency,
-    receiverCountry,
-    receiverState,
-    receiverCity,
-    receiverAddress,
-    commission: parseFloat(commission) || 0,
-    fee: parseFloat(fee) || 0,
-    tax: parseFloat(tax) || 0,
     exchangeRate: parseFloat(exchangeRate),
-    status: status || 'pending',
-    notes,
-    transactionDate: transactionDate || Date.now(),
+    description: description || '',
+    status: 'completed',
+    transactionDate: Date.now(),
     shopId: req.user.shopData.shopId,
     createdBy: req.user._id
   });
@@ -111,7 +61,7 @@ exports.createTransaction = asyncHandler(async (req, res) => {
 // @route   GET /api/customer-transactions
 // @access  Private
 exports.getTransactions = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, search = '', currency, status, fromDate, toDate } = req.query;
+  const { page = 1, limit = 10, search = '' } = req.query;
   
   let query = { shopId: req.user.shopData.shopId };
   
@@ -119,34 +69,9 @@ exports.getTransactions = asyncHandler(async (req, res) => {
   if (search) {
     query.$or = [
       { name: { $regex: search, $options: 'i' } },
-      { senderEmail: { $regex: search, $options: 'i' } },
-      { receiverEmail: { $regex: search, $options: 'i' } },
-      { senderPhone: { $regex: search, $options: 'i' } }
+      { senderName: { $regex: search, $options: 'i' } },
+      { receiverName: { $regex: search, $options: 'i' } }
     ];
-  }
-  
-  // Currency filter
-  if (currency) {
-    query.$or = [
-      { senderCurrency: currency },
-      { receiverCurrency: currency }
-    ];
-  }
-  
-  // Status filter
-  if (status && status !== 'all') {
-    query.status = status;
-  }
-  
-  // Date range filter
-  if (fromDate || toDate) {
-    query.transactionDate = {};
-    if (fromDate) {
-      query.transactionDate.$gte = new Date(fromDate);
-    }
-    if (toDate) {
-      query.transactionDate.$lte = new Date(toDate);
-    }
   }
   
   const total = await CustomerTransaction.countDocuments(query);
@@ -160,7 +85,18 @@ exports.getTransactions = asyncHandler(async (req, res) => {
   // Calculate summary statistics
   const totalSenderAmount = transactions.reduce((sum, t) => sum + t.senderAmount, 0);
   const totalReceiverAmount = transactions.reduce((sum, t) => sum + t.receiverAmount, 0);
-  const totalFees = transactions.reduce((sum, t) => sum + t.totalFees, 0);
+  
+  // Get totals by currency
+  const senderTotalsByCurrency = {};
+  const receiverTotalsByCurrency = {};
+  
+  transactions.forEach(t => {
+    if (!senderTotalsByCurrency[t.senderCurrency]) senderTotalsByCurrency[t.senderCurrency] = 0;
+    senderTotalsByCurrency[t.senderCurrency] += t.senderAmount;
+    
+    if (!receiverTotalsByCurrency[t.receiverCurrency]) receiverTotalsByCurrency[t.receiverCurrency] = 0;
+    receiverTotalsByCurrency[t.receiverCurrency] += t.receiverAmount;
+  });
   
   res.status(200).json({
     success: true,
@@ -169,7 +105,8 @@ exports.getTransactions = asyncHandler(async (req, res) => {
       totalTransactions: total,
       totalSenderAmount,
       totalReceiverAmount,
-      totalFees,
+      senderTotalsByCurrency,
+      receiverTotalsByCurrency,
       filteredCount: formattedTransactions.length
     },
     pagination: {
@@ -231,59 +168,27 @@ exports.updateTransaction = asyncHandler(async (req, res) => {
   
   const {
     name,
-    senderEmail,
-    senderPhone,
+    senderName,
     senderCurrency,
     senderAmount,
-    senderCountry,
-    senderState,
-    senderCity,
-    senderAddress,
-    receiverEmail,
-    receiverPhone,
+    receiverName,
     receiverCurrency,
-    receiverCountry,
-    receiverState,
-    receiverCity,
-    receiverAddress,
-    commission,
-    fee,
-    tax,
     exchangeRate,
-    status,
-    notes,
-    transactionDate
+    description
   } = req.body;
   
   // Update fields
   if (name) transaction.name = name;
-  if (senderEmail) transaction.senderEmail = senderEmail;
-  if (senderPhone) transaction.senderPhone = senderPhone;
+  if (senderName) transaction.senderName = senderName;
   if (senderCurrency) transaction.senderCurrency = senderCurrency;
   if (senderAmount) transaction.senderAmount = parseFloat(senderAmount);
-  if (senderCountry) transaction.senderCountry = senderCountry;
-  if (senderState !== undefined) transaction.senderState = senderState;
-  if (senderCity !== undefined) transaction.senderCity = senderCity;
-  if (senderAddress) transaction.senderAddress = senderAddress;
-  if (receiverEmail) transaction.receiverEmail = receiverEmail;
-  if (receiverPhone) transaction.receiverPhone = receiverPhone;
+  if (receiverName) transaction.receiverName = receiverName;
   if (receiverCurrency) transaction.receiverCurrency = receiverCurrency;
-  if (receiverCountry) transaction.receiverCountry = receiverCountry;
-  if (receiverState !== undefined) transaction.receiverState = receiverState;
-  if (receiverCity !== undefined) transaction.receiverCity = receiverCity;
-  if (receiverAddress) transaction.receiverAddress = receiverAddress;
-  if (commission !== undefined) transaction.commission = parseFloat(commission);
-  if (fee !== undefined) transaction.fee = parseFloat(fee);
-  if (tax !== undefined) transaction.tax = parseFloat(tax);
   if (exchangeRate) transaction.exchangeRate = parseFloat(exchangeRate);
-  if (status) transaction.status = status;
-  if (notes !== undefined) transaction.notes = notes;
-  if (transactionDate) transaction.transactionDate = transactionDate;
+  if (description !== undefined) transaction.description = description;
   
-  // Recalculate receiver amount and fees
-  const baseAmount = transaction.senderAmount * transaction.exchangeRate;
-  transaction.totalFees = transaction.commission + transaction.fee + transaction.tax;
-  transaction.receiverAmount = baseAmount - transaction.totalFees;
+  // Recalculate receiver amount
+  transaction.receiverAmount = transaction.senderAmount * transaction.exchangeRate;
   
   await transaction.save();
   
@@ -330,13 +235,7 @@ exports.getTransactionStats = asyncHandler(async (req, res) => {
   
   const totalTransactions = await CustomerTransaction.countDocuments(query);
   
-  // Status breakdown
-  const statusCount = await CustomerTransaction.aggregate([
-    { $match: query },
-    { $group: { _id: '$status', count: { $sum: 1 } } }
-  ]);
-  
-  // Currency breakdown for sender
+  // Get totals by currency for sender
   const senderCurrencyBreakdown = await CustomerTransaction.aggregate([
     { $match: query },
     { $group: {
@@ -347,7 +246,7 @@ exports.getTransactionStats = asyncHandler(async (req, res) => {
     }
   ]);
   
-  // Currency breakdown for receiver
+  // Get totals by currency for receiver
   const receiverCurrencyBreakdown = await CustomerTransaction.aggregate([
     { $match: query },
     { $group: {
@@ -356,26 +255,6 @@ exports.getTransactionStats = asyncHandler(async (req, res) => {
         count: { $sum: 1 }
       }
     }
-  ]);
-  
-  // Monthly trend (last 6 months)
-  const sixMonthsAgo = new Date();
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-  
-  const monthlyTrend = await CustomerTransaction.aggregate([
-    { $match: { ...query, transactionDate: { $gte: sixMonthsAgo } } },
-    {
-      $group: {
-        _id: {
-          year: { $year: '$transactionDate' },
-          month: { $month: '$transactionDate' }
-        },
-        totalSender: { $sum: '$senderAmount' },
-        totalReceiver: { $sum: '$receiverAmount' },
-        count: { $sum: 1 }
-      }
-    },
-    { $sort: { '_id.year': 1, '_id.month': 1 } }
   ]);
   
   // Get top customers by transaction volume
@@ -397,13 +276,8 @@ exports.getTransactionStats = asyncHandler(async (req, res) => {
     success: true,
     data: {
       totalTransactions,
-      statusBreakdown: statusCount.reduce((acc, curr) => {
-        acc[curr._id] = curr.count;
-        return acc;
-      }, {}),
       senderCurrencyBreakdown,
       receiverCurrencyBreakdown,
-      monthlyTrend,
       topCustomers
     }
   });
