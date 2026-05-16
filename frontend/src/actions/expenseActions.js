@@ -8,8 +8,8 @@ import {
   CLEAR_ERRORS
 } from "../constants/constants";
 
-const BASE_URI = `http://localhost:5000/api`;
-//const BASE_URI = `/api`;
+//const BASE_URI = `http://localhost:5000/api`;
+const BASE_URI = `/api`;
 
 // Get All Expenses
 export const getAllExpensesAction = (page = 1, limit = 10, search = '', category = '', fromDate = '', toDate = '') => async (dispatch) => {

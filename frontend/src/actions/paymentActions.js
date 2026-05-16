@@ -22,8 +22,8 @@ import {
 } from "../constants/constants";
 import { toast } from "react-toastify";
 
-const BASE_URI = `http://localhost:5000/api`;
-//const BASE_URI = `/api`;
+//const BASE_URI = `http://localhost:5000/api`;
+const BASE_URI = `/api`;
 
 // ==================== PAYMENT PROOF ACTIONS ====================
 

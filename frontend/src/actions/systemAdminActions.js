@@ -9,8 +9,8 @@ import {
   CLEAR_ERRORS
 } from "../constants/constants";
 
-const BASE_URI = `http://localhost:5000/api/auth`;
-//const BASE_URI = `/api`;
+//const BASE_URI = `http://localhost:5000/api/auth`;
+const BASE_URI = `/api`;
 
 // ==================== SYSTEM ADMIN ACTIONS ====================
 
