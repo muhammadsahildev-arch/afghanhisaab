@@ -455,7 +455,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
+        <div className="text-center px-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">{t.loadingDashboard}</p>
         </div>
@@ -473,32 +473,32 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header */}
+      {/* Header - Responsive */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-red-500 rounded-lg flex items-center justify-center">
-              <DollarSign size={18} className="text-white" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <DollarSign size={18} className="text-white sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h1 className="text-base font-bold text-gray-800">{t.moneyExchange}</h1>
-              <p className="text-xs text-gray-500">{t.recordsManagement}</p>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base font-bold text-gray-800 truncate">{t.moneyExchange}</h1>
+              <p className="text-xs text-gray-500 hidden sm:block">{t.recordsManagement}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="p-2 relative">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <button className="p-2 relative active:bg-gray-100 rounded-lg transition-colors touch-manipulation">
               <Bell size={20} className="text-gray-600" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             <button 
               onClick={handleLogout} 
-              className="flex items-center gap-1 px-3 py-1.5 bg-red-50 rounded-lg active:bg-red-100 transition-colors"
+              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 bg-red-50 rounded-lg active:bg-red-100 transition-colors touch-manipulation"
             >
               <LogOut size={16} className="text-red-600" />
-              <span className="text-xs font-medium text-red-600">{t.logout}</span>
+              <span className="text-xs font-medium text-red-600 hidden sm:inline">{t.logout}</span>
             </button>
-            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-              {user?.profile?.fullName?.charAt(0) || 'U'}
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-green-500 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              {user?.profile?.fullName?.charAt(0) || user?.email?.charAt(0) || 'U'}
             </div>
           </div>
         </div>
@@ -506,85 +506,85 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="pb-20">
-        {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-green-500 to-red-500 rounded-b-3xl p-5 text-white">
-          <p className="text-sm opacity-90">{t.welcomeBack}</p>
-          <p className="text-xl font-bold mt-1">{user?.profile?.fullName || 'User'}</p>
+        {/* Welcome Section - Responsive */}
+        <div className="bg-gradient-to-r from-green-500 to-red-500 rounded-b-3xl p-5 sm:p-6 text-white">
+          <p className="text-xs sm:text-sm opacity-90">{t.welcomeBack}</p>
+          <p className="text-lg sm:text-xl font-bold mt-1 break-words">{user?.profile?.fullName || user?.email || 'User'}</p>
           <p className="text-xs opacity-80 mt-1 capitalize">{user?.role === 'system_admin' ? t.admin : t.customer}</p>
         </div>
 
-        {/* Quick Stats - 4 column grid */}
+        {/* Quick Stats - Responsive Grid */}
         <div className="px-4 -mt-3">
-          <div className="grid grid-cols-4 gap-2">
-            <div className="bg-white rounded-xl p-2 shadow-sm text-center">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            <div className="bg-white rounded-xl p-2 sm:p-3 shadow-sm text-center">
               <p className="text-xs text-gray-500">{t.totalTransactions}</p>
-              <p className="text-base font-bold text-gray-800">{stats.totalTransactions}</p>
+              <p className="text-sm sm:text-base font-bold text-gray-800">{stats.totalTransactions}</p>
             </div>
-            <div className="bg-white rounded-xl p-2 shadow-sm text-center">
+            <div className="bg-white rounded-xl p-2 sm:p-3 shadow-sm text-center">
               <p className="text-xs text-gray-500">{t.dailyRecords}</p>
-              <p className="text-base font-bold text-gray-800">{stats.totalDailyRecords}</p>
+              <p className="text-sm sm:text-base font-bold text-gray-800">{stats.totalDailyRecords}</p>
             </div>
-            <div className="bg-white rounded-xl p-2 shadow-sm text-center">
+            <div className="bg-white rounded-xl p-2 sm:p-3 shadow-sm text-center">
               <p className="text-xs text-gray-500">{t.ledgerEntries}</p>
-              <p className="text-base font-bold text-gray-800">{stats.totalLedgerEntries}</p>
+              <p className="text-sm sm:text-base font-bold text-gray-800">{stats.totalLedgerEntries}</p>
             </div>
-            <div className="bg-white rounded-xl p-2 shadow-sm text-center">
+            <div className="bg-white rounded-xl p-2 sm:p-3 shadow-sm text-center">
               <p className="text-xs text-gray-500">{t.netBalance}</p>
-              <p className="text-sm font-bold text-green-600 truncate">{formatAmount(stats.netBalance)}</p>
+              <p className="text-xs sm:text-sm font-bold text-green-600 truncate">{formatAmount(stats.netBalance)}</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Cards - Income/Expense */}
-        <div className="px-4 mt-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-green-50 rounded-xl p-3">
+        {/* Stats Cards - Income/Expense Responsive */}
+        <div className="px-4 mt-4 sm:mt-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="bg-green-50 rounded-xl p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-green-600">{t.totalIncome}</p>
-                  <p className="text-lg font-bold text-green-600">{formatAmount(stats.totalIncome)}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-green-600">{t.totalIncome}</p>
+                  <p className="text-base sm:text-lg font-bold text-green-600 truncate">{formatAmount(stats.totalIncome)}</p>
                 </div>
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <ArrowUpRight size={16} className="text-green-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <ArrowUpRight size={16} className="text-green-600 sm:w-5 sm:h-5" />
                 </div>
               </div>
             </div>
-            <div className="bg-red-50 rounded-xl p-3">
+            <div className="bg-red-50 rounded-xl p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-red-600">{t.totalExpense}</p>
-                  <p className="text-lg font-bold text-red-600">{formatAmount(stats.totalExpense)}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-red-600">{t.totalExpense}</p>
+                  <p className="text-base sm:text-lg font-bold text-red-600 truncate">{formatAmount(stats.totalExpense)}</p>
                 </div>
-                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                  <ArrowDownRight size={16} className="text-red-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <ArrowDownRight size={16} className="text-red-600 sm:w-5 sm:h-5" />
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Modules Section */}
-        <div className="px-4 mt-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-gray-800">{t.mainModules}</h2>
+        {/* Modules Section - Responsive */}
+        <div className="px-4 mt-6 sm:mt-8">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-bold text-gray-800">{t.mainModules}</h2>
             <p className="text-xs text-gray-400">{t.quickAccess}</p>
           </div>
           
-          <div className="space-y-2">
+          <div className="space-y-2 sm:space-y-3">
             {modules.map((module) => {
               const Icon = module.icon;
               return (
-                <Link key={module.id} to={module.path}>
-                  <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 active:bg-gray-50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 ${module.bgColor} rounded-lg flex items-center justify-center`}>
-                        <Icon size={18} className={module.textColor} />
+                <Link key={module.id} to={module.path} className="block">
+                  <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 active:bg-gray-50 transition-colors touch-manipulation">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 ${module.bgColor} rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0`}>
+                        <Icon size={18} className={`${module.textColor} sm:w-5 sm:h-5`} />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-semibold text-gray-800">{module.name}</h3>
-                        <p className="text-xs text-gray-500">{module.description}</p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-800 truncate">{module.name}</h3>
+                        <p className="text-xs text-gray-500 truncate">{module.description}</p>
                       </div>
-                      <ChevronRight size={16} className="text-gray-400" />
+                      <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />
                     </div>
                   </div>
                 </Link>
@@ -593,30 +593,52 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Recent Activities */}
+        {/* Recent Activities - Responsive */}
         {recentActivities.length > 0 && (
-          <div className="px-4 mt-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-bold text-gray-800">{t.recentActivities}</h2>
+          <div className="px-4 mt-6 sm:mt-8">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-lg font-bold text-gray-800">{t.recentActivities}</h2>
               <p className="text-xs text-gray-400">{t.latestUpdates}</p>
             </div>
             
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               {recentActivities.map((activity, idx) => (
-                <div key={activity.id} className={`p-3 flex items-center gap-3 ${idx !== recentActivities.length - 1 ? 'border-b border-gray-100' : ''}`}>
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${activity.color}`}>
-                    <activity.icon size={14} />
+                <div key={activity.id} className={`p-3 sm:p-4 flex items-center gap-3 sm:gap-4 ${idx !== recentActivities.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${activity.color}`}>
+                    <activity.icon size={14} className="sm:w-4 sm:h-4" />
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-800">{activity.action}</p>
-                    <p className="text-xs text-gray-500">{activity.details}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base font-medium text-gray-800 truncate">{activity.action}</p>
+                    <p className="text-xs text-gray-500 truncate">{activity.details}</p>
                   </div>
-                  <p className="text-xs text-gray-400">{activity.time}</p>
+                  <p className="text-xs text-gray-400 flex-shrink-0">{activity.time}</p>
                 </div>
               ))}
             </div>
           </div>
         )}
+
+        {/* Bottom Navigation for Mobile */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 sm:hidden">
+          <div className="flex justify-around py-2">
+            <button className="flex flex-col items-center p-2 text-green-600">
+              <Home size={20} />
+              <span className="text-xs mt-1">Home</span>
+            </button>
+            <button className="flex flex-col items-center p-2 text-gray-500">
+              <TrendingUp size={20} />
+              <span className="text-xs mt-1">Stats</span>
+            </button>
+            <button className="flex flex-col items-center p-2 text-gray-500">
+              <Bell size={20} />
+              <span className="text-xs mt-1">Alerts</span>
+            </button>
+            <button className="flex flex-col items-center p-2 text-gray-500">
+              <Settings size={20} />
+              <span className="text-xs mt-1">Settings</span>
+            </button>
+          </div>
+        </div>
       </main>
     </div>
   );

@@ -22,6 +22,7 @@ import {
   clearErrors
 } from "../../../actions/ledgerActions";
 import { UPDATE_LEDGER_ENTRY_RESET } from "../../../constants/constants";
+import { evaluate } from 'mathjs';
 
 const LedgerUpdate = () => {
   const dispatch = useDispatch();
@@ -311,16 +312,16 @@ const LedgerUpdate = () => {
     }
   };
 
-  // Calculator functions
-  const evaluateExpression = (expr) => {
-    try {
-      let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
-      const result = Function('return (' + expression + ')')();
-      return result;
-    } catch (e) {
-      return null;
-    }
-  };
+ const evaluateExpression = (expr) => {
+  try {
+    let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
+    const result = evaluate(expression);
+    return typeof result === 'number' && !isNaN(result) ? result : null;
+  } catch (error) {
+    console.log('Calculation error:', error);
+    return null;
+  }
+};
 
   const handleCalculatorButton = (value) => {
     if (value === 'C') {

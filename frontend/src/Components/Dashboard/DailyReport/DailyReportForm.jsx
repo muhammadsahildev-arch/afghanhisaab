@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { createDailyRecordAction, clearErrors } from "../../../actions/dailyRecordActions";
 import { CREATE_DAILY_RECORD_RESET } from "../../../constants/constants";
+import { evaluate } from 'mathjs';
 
 const DailyReportForm = () => {
   const dispatch = useDispatch();
@@ -271,15 +272,16 @@ const DailyReportForm = () => {
     }
   };
 
-  const evaluateExpression = (expr) => {
-    try {
-      let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
-      const result = Function('return (' + expression + ')')();
-      return result;
-    } catch (e) {
-      return null;
-    }
-  };
+const evaluateExpression = (expr) => {
+  try {
+    let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
+    const result = evaluate(expression);
+    return typeof result === 'number' && !isNaN(result) ? result : null;
+  } catch (error) {
+    console.log('Calculation error:', error);
+    return null;
+  }
+};
 
   const handleCalculatorButton = (value) => {
     if (value === 'C') {

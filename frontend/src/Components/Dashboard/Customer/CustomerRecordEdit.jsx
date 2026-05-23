@@ -24,6 +24,7 @@ import {
   clearErrors
 } from "../../../actions/transactionActions";
 import { UPDATE_TRANSACTION_RESET, DELETE_TRANSACTION_RESET } from "../../../constants/constants";
+import { evaluate } from 'mathjs';
 
 const CustomerRecordEdit = () => {
   const dispatch = useDispatch();
@@ -383,16 +384,17 @@ const CustomerRecordEdit = () => {
     }
   };
 
-  // Calculator functions
   const evaluateExpression = (expr) => {
-    try {
-      let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
-      const result = Function('return (' + expression + ')')();
-      return result;
-    } catch (e) {
-      return null;
-    }
-  };
+  try {
+    let expression = expr.replace(/×/g, '*').replace(/÷/g, '/');
+    const result = evaluate(expression);
+    return typeof result === 'number' && !isNaN(result) ? result : null;
+  } catch (error) {
+    console.log('Calculation error:', error);
+    return null;
+  }
+};
+
 
   const handleCalculatorButton = (value) => {
     if (value === 'C') {
